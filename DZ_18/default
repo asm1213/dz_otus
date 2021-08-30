@@ -1,0 +1,11 @@
+default menu
+prompt 0
+timeout 600
+MENU TITLE Demo PXE setup
+
+label TEST HTTP BOOT
+  menu label ^CENTOS (HTTP)
+  kernel http://192.168.34.10/images/CentOS-8/vmlinuz
+  append initrd=http://192.168.34.10/images/CentOS-8/initrd.img ip=enp0s3:dhcp inst.ks=http://192.168.34.10/ks.cfg inst.repo=http://192.168.34.10/images/CentOS-8/CentOS8.3.2011/
+
+

@@ -1,0 +1,61 @@
+---
+- name: Config Eth
+  hosts: centralRouter
+  become: true
+  tasks:
+    - name: Install needed network manager libs
+      ansible.builtin.package:
+        name:
+          - NetworkManager-libnm
+          - nm-connection-editor
+          - libsemanage-python
+          - policycoreutils-python
+        state: present
+    - name: Install NetworkManager-tui
+      yum:
+        name:
+          - NetworkManager-tui
+        state: latest
+    - name: ifconfig0
+      community.general.nmcli:
+        conn_name: "System eth0"
+        type: ethernet
+        ifname: eth0
+        never_default4: yes
+        state: present
+      notify:
+        - restartnet
+    - name: ifconfig1
+      community.general.nmcli:
+        conn_name: "System eth1"
+        type: ethernet
+        ifname: eth1
+        gw4: 192.168.255.1
+        state: present
+      notify:
+        - restartnet
+    - name: ifconfig1
+      community.general.nmcli:
+        conn_name: "System eth3"
+        ifname: eth3
+        type: ethernet
+        routes4: '192.168.2.64/28 192.168.3.2, 192.168.1.128/26 192.168.3.3'
+        state: present
+      notify:
+        - restartnet
+    - name: forwarding
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+    - name: Ensure network is running
+      ansible.builtin.service:
+        name: network
+        state: started        
+  handlers:
+    - name: restartnet
+      ansible.builtin.service:
+        name: network
+        state: restarted

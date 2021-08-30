@@ -1,0 +1,79 @@
+vagrant@ubuntuzfs:/$ sudo zpool create mypool mirror sdc sdd
+vagrant@ubuntuzfs:/$ zpool list
+NAME     SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
+mypool  4.50G   110K  4.50G        -         -     0%     0%  1.00x    ONLINE  -
+vagrant@ubuntuzfs:/$ lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 55.5M  1 loop /snap/core18/1997
+loop1    7:1    0 67.6M  1 loop /snap/lxd/20326
+loop2    7:2    0 32.1M  1 loop /snap/snapd/11841
+sda      8:0    0   40G  0 disk
+└─sda1   8:1    0   40G  0 part /
+sdb      8:16   0   10M  0 disk
+sdc      8:32   0  4.9G  0 disk
+├─sdc1   8:33   0  4.9G  0 part
+└─sdc9   8:41   0    8M  0 part
+sdd      8:48   0  4.9G  0 disk
+├─sdd1   8:49   0  4.9G  0 part
+└─sdd9   8:57   0    8M  0 part
+vagrant@ubuntuzfs:/$ sudo zfs create -o compression=gzip-9 mypool/zfs1
+vagrant@ubuntuzfs:/$ zfs list
+NAME          USED  AVAIL     REFER  MOUNTPOINT
+mypool        116K  4.36G       24K  /mypool
+mypool/zfs1    24K  4.36G       24K  /mypool/zfs1
+vagrant@ubuntuzfs:/$ zfs get compress
+NAME         PROPERTY     VALUE     SOURCE
+mypool       compression  off       default
+mypool/zfs1  compression  gzip-9    local
+vagrant@ubuntuzfs:/$ zfs get compressratio
+NAME         PROPERTY       VALUE  SOURCE
+mypool       compressratio  1.00x  -
+mypool/zfs1  compressratio  1.00x  -
+vagrant@ubuntuzfs:/$ sudo zfs create -o compression=gzip mypool/zfs2
+vagrant@ubuntuzfs:/$ sudo zfs create -o compression=lzjb mypool/zfs3
+vagrant@ubuntuzfs:/$ sudo zfs create -o compression=zle mypool/zfs4
+vagrant@ubuntuzfs:/$ sudo zfs create -o compression=zl mypool/zfs5
+cannot create 'mypool/zfs5': 'compression' must be one of 'on | off | lzjb | gzip | gzip-[1-9] | zle | lz4'
+vagrant@ubuntuzfs:/$ sudo zfs create -o compression=lz4 mypool/zfs5
+vagrant@ubuntuzfs:/$ zfs get compressratio,compress
+NAME         PROPERTY       VALUE     SOURCE
+mypool       compressratio  1.00x     -
+mypool       compression    off       default
+mypool/zfs1  compressratio  1.00x     -
+mypool/zfs1  compression    gzip-9    local
+mypool/zfs2  compressratio  1.00x     -
+mypool/zfs2  compression    gzip      local
+mypool/zfs3  compressratio  1.00x     -
+mypool/zfs3  compression    lzjb      local
+mypool/zfs4  compressratio  1.00x     -
+mypool/zfs4  compression    zle       local
+mypool/zfs5  compressratio  1.00x     -
+mypool/zfs5  compression    lz4       local
+vagrant@ubuntuzfs:/$ cd mypool
+vagrant@ubuntuzfs:/mypool$ cd zfs2
+vagrant@ubuntuzfs:/mypool/zfs2$ sudo curl -o "War_and_Peace.txt" -J -L https://www.gutenberg.org/cache/epub/2600/pg2600.txt
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 1181k  100 1181k    0     0   375k      0  0:00:03  0:00:03 --:--:--  375k
+vagrant@ubuntuzfs:/mypool/zfs2$ dir
+War_and_Peace.txt
+vagrant@ubuntuzfs:/$ cp mypool/zfs2/War_and_Peace.txt mypool/zfs1
+cp: cannot create regular file 'mypool/zfs1/War_and_Peace.txt': Permission denied
+vagrant@ubuntuzfs:/$ sudo cp mypool/zfs2/War_and_Peace.txt mypool/zfs1
+vagrant@ubuntuzfs:/$ sudo cp mypool/zfs2/War_and_Peace.txt mypool/zfs3
+vagrant@ubuntuzfs:/$ sudo cp mypool/zfs2/War_and_Peace.txt mypool/zfs4
+vagrant@ubuntuzfs:/$ sudo cp mypool/zfs2/War_and_Peace.txt mypool/zfs5
+vagrant@ubuntuzfs:/$ zfs get compressratio,compress
+NAME         PROPERTY       VALUE     SOURCE
+mypool       compressratio  1.08x     -
+mypool       compression    off       default
+mypool/zfs1  compressratio  1.08x     -
+mypool/zfs1  compression    gzip-9    local
+mypool/zfs2  compressratio  1.08x     -
+mypool/zfs2  compression    gzip      local
+mypool/zfs3  compressratio  1.07x     -
+mypool/zfs3  compression    lzjb      local
+mypool/zfs4  compressratio  1.08x     -
+mypool/zfs4  compression    zle       local
+mypool/zfs5  compressratio  1.08x     -
+mypool/zfs5  compression    lz4       local

@@ -1,0 +1,45 @@
+---
+- name: Config Eth
+  hosts: office1Server
+  become: true
+  tasks:
+    - name: Install needed network manager libs
+      ansible.builtin.package:
+        name:
+          - NetworkManager-libnm
+          - nm-connection-editor
+          - libsemanage-python
+          - policycoreutils-python
+        state: present
+    - name: Install NetworkManager-tui
+      yum:
+        name:
+          - NetworkManager-tui
+        state: latest
+    - name: ifconfig0
+      community.general.nmcli:
+        conn_name: "System eth0"
+        type: ethernet
+        ifname: eth0
+        never_default4: yes
+        state: present
+      notify:
+        - restartnet
+    - name: ifconfig1
+      community.general.nmcli:
+        conn_name: "System eth1"
+        ifname: eth1
+        type: ethernet
+        gw4: 192.168.2.126
+        state: present
+      notify:
+        - restartnet
+    - name: Ensure network is running
+      ansible.builtin.service:
+        name: network
+        state: started
+  handlers:
+    - name: restartnet
+      ansible.builtin.service:
+        name: network
+        state: restarted

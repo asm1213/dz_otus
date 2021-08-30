@@ -1,0 +1,222 @@
+root@ubuntuzfs:/# cd /mypool/zfs1
+root@ubuntuzfs:/mypool/zfs1# wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1KRBNW33QWqbvbVHa3hLJivOAt60yukkg' -O zfs_task1.tar.gz
+--2021-05-16 16:14:34--  https://docs.google.com/uc?export=download&id=1KRBNW33QWqbvbVHa3hLJivOAt60yukkg
+Resolving docs.google.com (docs.google.com)... 108.177.14.194, 2a00:1450:4010:c0f::c2
+Connecting to docs.google.com (docs.google.com)|108.177.14.194|:443... connected.
+HTTP request sent, awaiting response... 302 Moved Temporarily
+Location: https://doc-0c-bo-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/qigr11k188fj7jqphtifabr0besntj35/1621181625000/16189157874053420687/*/1KRBNW33QWqbvbVHa3hLJivOAt60yukkg?e=download [following]
+Warning: wildcards not supported in HTTP.
+--2021-05-16 16:14:40--  https://doc-0c-bo-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/qigr11k188fj7jqphtifabr0besntj35/1621181625000/16189157874053420687/*/1KRBNW33QWqbvbVHa3hLJivOAt60yukkg?e=download
+Resolving doc-0c-bo-docs.googleusercontent.com (doc-0c-bo-docs.googleusercontent.com)... 74.125.131.132, 2a00:1450:4010:c0e::84
+Connecting to doc-0c-bo-docs.googleusercontent.com (doc-0c-bo-docs.googleusercontent.com)|74.125.131.132|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [application/x-gzip]
+Saving to: ‘zfs_task1.tar.gz’
+
+zfs_task1.tar.gz                     [   <=>                                                   ]   6.94M  12.6MB/s    in 0.6s
+
+2021-05-16 16:14:45 (12.6 MB/s) - ‘zfs_task1.tar.gz’ saved [7275140]
+
+root@ubuntuzfs:/mypool/zfs1# tar xvzf zfs_task1.tar.gz
+zpoolexport/
+zpoolexport/filea
+zpoolexport/fileb
+root@ubuntuzfs:/mypool/zfs1# cd zpoolexport/
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# zpool import -d filea -d fileb otus
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# zpool list
+NAME     SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
+mypool  4.50G  21.3M  4.48G        -         -     0%     0%  1.00x    ONLINE  -
+otus     480M  2.21M   478M        -         -     0%     0%  1.00x    ONLINE  -
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# zpool otus
+unrecognized command 'otus'
+usage: zpool command args ...
+where 'command' is one of the following:
+
+        version
+
+        create [-fnd] [-o property=value] ...
+            [-O file-system-property=value] ...
+            [-m mountpoint] [-R root] <pool> <vdev> ...
+        destroy [-f] <pool>
+
+        add [-fgLnP] [-o property=value] <pool> <vdev> ...
+        remove [-nps] <pool> <device> ...
+
+        labelclear [-f] <vdev>
+
+        checkpoint [--discard] <pool> ...
+
+        list [-gHLpPv] [-o property[,...]] [-T d|u] [pool] ...
+            [interval [count]]
+        iostat [[[-c [script1,script2,...][-lq]]|[-rw]] [-T d | u] [-ghHLpPvy]
+            [[pool ...]|[pool vdev ...]|[vdev ...]] [[-n] interval [count]]
+        status [-c [script1,script2,...]] [-igLpPstvxD]  [-T d|u] [pool] ...
+            [interval [count]]
+
+        online [-e] <pool> <device> ...
+        offline [-f] [-t] <pool> <device> ...
+        clear [-nF] <pool> [device]
+        reopen [-n] <pool>
+
+        attach [-f] [-o property=value] <pool> <device> <new-device>
+        detach <pool> <device>
+        replace [-f] [-o property=value] <pool> <device> [new-device]
+        split [-gLnPl] [-R altroot] [-o mntopts]
+            [-o property=value] <pool> <newpool> [<device> ...]
+
+        initialize [-c | -s] <pool> [<device> ...]
+        resilver <pool> ...
+        scrub [-s | -p] <pool> ...
+        trim [-d] [-r <rate>] [-c | -s] <pool> [<device> ...]
+
+        import [-d dir] [-D]
+        import [-o mntopts] [-o property=value] ...
+            [-d dir | -c cachefile] [-D] [-l] [-f] [-m] [-N] [-R root] [-F [-n]] -a
+        import [-o mntopts] [-o property=value] ...
+            [-d dir | -c cachefile] [-D] [-l] [-f] [-m] [-N] [-R root] [-F [-n]]
+            [--rewind-to-checkpoint] <pool | id> [newpool]
+        export [-af] <pool> ...
+        upgrade
+        upgrade -v
+        upgrade [-V version] <-a | pool ...>
+        reguid <pool>
+
+        history [-il] [<pool>] ...
+        events [-vHf [pool] | -c]
+
+        get [-Hp] [-o "all" | field[,...]] <"all" | property[,...]> <pool> ...
+        set <property=value> <pool>
+        sync [pool] ...
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# zpool status
+  pool: mypool
+ state: ONLINE
+  scan: none requested
+config:
+
+        NAME        STATE     READ WRITE CKSUM
+        mypool      ONLINE       0     0     0
+          mirror-0  ONLINE       0     0     0
+            sdc     ONLINE       0     0     0
+            sdd     ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: otus
+ state: ONLINE
+  scan: none requested
+config:
+
+        NAME                                STATE     READ WRITE CKSUM
+        otus                                ONLINE       0     0     0
+          mirror-0                          ONLINE       0     0     0
+            /mypool/zfs1/zpoolexport/filea  ONLINE       0     0     0
+            /mypool/zfs1/zpoolexport/fileb  ONLINE       0     0     0
+
+errors: No known data errors
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# zfs list
+NAME             USED  AVAIL     REFER  MOUNTPOINT
+mypool          17.2M  4.34G       26K  /mypool
+mypool/zfs1     12.2M  4.34G     12.2M  /mypool/zfs1
+mypool/zfs2     1.18M  4.34G     1.18M  /mypool/zfs2
+mypool/zfs3     1.19M  4.34G     1.19M  /mypool/zfs3
+mypool/zfs4     1.18M  4.34G     1.18M  /mypool/zfs4
+mypool/zfs5     1.18M  4.34G     1.18M  /mypool/zfs5
+otus            2.04M   350M       24K  /otus
+otus/hometask2  1.88M   350M     1.88M  /otus/hometask2
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# zfs get recordsize otus
+NAME  PROPERTY    VALUE    SOURCE
+otus  recordsize  128K     local
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# zfs get compress,compressratio otus
+NAME  PROPERTY       VALUE     SOURCE
+otus  compression    zle       local
+otus  compressratio  1.00x     -
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# zfs get checksum otus
+NAME  PROPERTY  VALUE      SOURCE
+otus  checksum  sha256     local
+root@ubuntuzfs:/mypool/zfs1/zpoolexport# cd /
+root@ubuntuzfs:/# cd /mypool/zfs2
+root@ubuntuzfs:/mypool/zfs2# СДУФК
+СДУФК: command not found
+root@ubuntuzfs:/mypool/zfs2# CLEAR
+CLEAR: command not found
+root@ubuntuzfs:/mypool/zfs2# wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG' -O otus_task2.file
+--2021-05-16 16:21:21--  https://docs.google.com/uc?export=download&id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG
+Resolving docs.google.com (docs.google.com)... 108.177.14.194, 2a00:1450:4010:c0f::c2
+Connecting to docs.google.com (docs.google.com)|108.177.14.194|:443... connected.
+HTTP request sent, awaiting response... 302 Moved Temporarily
+Location: https://doc-00-bo-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/a4ajdkrgf4hv7ijgsv8ft40p780ao0ks/1621182075000/16189157874053420687/*/1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG?e=download [following]
+Warning: wildcards not supported in HTTP.
+--2021-05-16 16:21:24--  https://doc-00-bo-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/a4ajdkrgf4hv7ijgsv8ft40p780ao0ks/1621182075000/16189157874053420687/*/1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG?e=download
+Resolving doc-00-bo-docs.googleusercontent.com (doc-00-bo-docs.googleusercontent.com)... 173.194.73.132, 2a00:1450:4010:c0d::84
+Connecting to doc-00-bo-docs.googleusercontent.com (doc-00-bo-docs.googleusercontent.com)|173.194.73.132|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [application/octet-stream]
+Saving to: ‘otus_task2.file’
+
+otus_task2.file                      [  <=>                                                    ]   5.18M  13.7MB/s    in 0.4s
+
+2021-05-16 16:21:26 (13.7 MB/s) - ‘otus_task2.file’ saved [5432736]
+
+root@ubuntuzfs:/mypool/zfs2# DIR
+DIR: command not found
+root@ubuntuzfs:/mypool/zfs2# dir
+War_and_Peace.txt  otus_task2.file
+root@ubuntuzfs:/mypool/zfs2# zfs list -t snapshot
+no datasets available
+root@ubuntuzfs:/mypool/zfs2# zfs create /mypool/zfs3/restore
+cannot create '/mypool/zfs3/restore': leading slash in name
+root@ubuntuzfs:/mypool/zfs2# zfs create mypool/zfs3/restore
+root@ubuntuzfs:/mypool/zfs2# zfs list
+NAME                  USED  AVAIL     REFER  MOUNTPOINT
+mypool               19.4M  4.34G       26K  /mypool
+mypool/zfs1          12.2M  4.34G     12.2M  /mypool/zfs1
+mypool/zfs2          3.34M  4.34G     3.34M  /mypool/zfs2
+mypool/zfs3          1.21M  4.34G     1.19M  /mypool/zfs3
+mypool/zfs3/restore    24K  4.34G       24K  /mypool/zfs3/restore
+mypool/zfs4          1.18M  4.34G     1.18M  /mypool/zfs4
+mypool/zfs5          1.18M  4.34G     1.18M  /mypool/zfs5
+otus                 2.04M   350M       24K  /otus
+otus/hometask2       1.88M   350M     1.88M  /otus/hometask2
+root@ubuntuzfs:/mypool/zfs2# zfs receive mypool/zfs3/restore < otus
+otus            otus/hometask2
+root@ubuntuzfs:/mypool/zfs2# zfs receive mypool/zfs3/restore < otus_task2.file
+cannot receive new filesystem stream: destination 'mypool/zfs3/restore' exists
+must specify -F to overwrite it
+root@ubuntuzfs:/mypool/zfs2# zfs receive -F mypool/zfs3/restore < otus_task2.file
+root@ubuntuzfs:/mypool/zfs2# cd mypoo/zfs3/restore
+-bash: cd: mypoo/zfs3/restore: No such file or directory
+root@ubuntuzfs:/mypool/zfs2# zfs list
+NAME                  USED  AVAIL     REFER  MOUNTPOINT
+mypool               21.8M  4.34G       26K  /mypool
+mypool/zfs1          12.2M  4.34G     12.2M  /mypool/zfs1
+mypool/zfs2          3.34M  4.34G     3.34M  /mypool/zfs2
+mypool/zfs3          3.63M  4.34G     1.19M  /mypool/zfs3
+mypool/zfs3/restore  2.44M  4.34G     2.44M  /mypool/zfs3/restore
+mypool/zfs4          1.18M  4.34G     1.18M  /mypool/zfs4
+mypool/zfs5          1.18M  4.34G     1.18M  /mypool/zfs5
+otus                 2.04M   350M       24K  /otus
+otus/hometask2       1.88M   350M     1.88M  /otus/hometask2
+root@ubuntuzfs:/mypool/zfs2# cd /mypool/zfs3/restore/
+root@ubuntuzfs:/mypool/zfs3/restore# dir
+10M.file  Limbo.txt  Moby_Dick.txt  War_and_Peace.txt  cinderella.tar  for_examaple.txt  homework4.txt  task1  world.sql
+root@ubuntuzfs:/mypool/zfs3/restore# nano homework4.txt
+root@ubuntuzfs:/mypool/zfs3/restore# nano task1
+root@ubuntuzfs:/mypool/zfs3/restore# dir
+10M.file  Limbo.txt  Moby_Dick.txt  War_and_Peace.txt  cinderella.tar  for_examaple.txt  homework4.txt  task1  world.sql
+root@ubuntuzfs:/mypool/zfs3/restore# cd task1/
+root@ubuntuzfs:/mypool/zfs3/restore/task1# dir
+README  file_mess
+root@ubuntuzfs:/mypool/zfs3/restore/task1# nano README
+root@ubuntuzfs:/mypool/zfs3/restore/task1# cd
+root@ubuntuzfs:~# cd /mypool/zfs3/restore/
+root@ubuntuzfs:/mypool/zfs3/restore# dir
+10M.file  Limbo.txt  Moby_Dick.txt  War_and_Peace.txt  cinderella.tar  for_examaple.txt  homework4.txt  task1  world.sql
+root@ubuntuzfs:/mypool/zfs3/restore# tar xvzf cinderella.tar
+
+gzip: stdin: not in gzip format
+tar: Child returned status 1
+tar: Error is not recoverable: exiting now
+root@ubuntuzfs:/mypool/zfs3/restore# nano cinderella.tar
+root@ubuntuzfs:/mypool/zfs3/restore# ^C
+root@ubuntuzfs:/mypool/zfs3/restore# ^C
+root@ubuntuzfs:/mypool/zfs3/restore#

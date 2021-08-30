@@ -1,0 +1,68 @@
+---
+- name: Config Eth
+  hosts: inetRouter
+  become: true
+  tasks:
+    - name: Install needed network manager libs
+      ansible.builtin.package:
+        name:
+          - NetworkManager-libnm
+          - nm-connection-editor
+          - libsemanage-python
+          - policycoreutils-python
+        state: present
+    - name: Install NetworkManager-tui
+      yum:
+        name:
+          - NetworkManager-tui
+          - iptables-services
+        state: latest
+    - name: ifconfig0
+      community.general.nmcli:
+        conn_name: "System eth0"
+        type: ethernet
+        ifname: eth0
+        state: present
+      notify:
+        - restartnet
+    - name: ifconfig1
+      community.general.nmcli:
+        conn_name: "System eth1"
+        ifname: eth1
+        type: ethernet
+        routes4: '192.168.3.0/24 192.168.255.2, 192.168.0.1/28 192.168.255.2, 192.168.2.64/28 192.168.255.2, 192.168.1.128/26 192.168.255.2'
+        state: present
+      notify:
+        - restartnet
+    - name: forwarding
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+    - name: Ensure network is running
+      ansible.builtin.service:
+        name: network
+        state: started
+    - name: enable iptables service
+      ansible.builtin.systemd:
+        name: iptables
+        enabled: yes 
+        state: started  
+    - name: Flush iptables
+      ansible.builtin.iptables:
+        flush: yes
+    - name: enable SNAT via iptables
+      ansible.builtin.iptables:
+        table: nat
+        chain: POSTROUTING
+        jump: SNAT
+        out_interface: eth0
+        to_source: 10.0.2.15  
+          
+  handlers:
+    - name: restartnet
+      ansible.builtin.service:
+        name: network
+        state: restarted
