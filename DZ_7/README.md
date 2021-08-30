@@ -7,16 +7,16 @@
 Во всех случаях cкрипты работали , для теста сделал в скрипт test.sh в /test 
 Скрины ниже
 
-![Иллюстрация к проекту](https://github.com/asm1213/blob/main/dz_otus/DZ_7/pics/1.jpg)
-![Иллюстрация к проекту](https://github.com/asm1213/blob/main/dz_otus/DZ_7/pics/2.jpg)
-![Иллюстрация к проекту](https://github.com/asm1213/blob/main/dz_otus/DZ_7/pics/3.jpg)
-![Иллюстрация к проекту](https://github.com/asm1213/blob/main/dz_otus/DZ_7/pics/4.jpg)
+![Иллюстрация к проекту](https://github.com/asm1213/dz_otus/blob/main/DZ_7/pics/1.jpg)
+![Иллюстрация к проекту](https://github.com/asm1213/dz_otus/blob/main/DZ_7/pics/2.jpg)
+![Иллюстрация к проекту](https://github.com/asm1213/dz_otus/blob/main/DZ_7/pics/3.jpg)
+![Иллюстрация к проекту](https://github.com/asm1213/dz_otus/blob/main/DZ_7/pics/4.jpg)
 ### Часть 2
 Переименовал volumegroup и отредактировал /etc/fstab, /etc/default/grub и в моем случае /boot/efi/EFI/centos/grub.cfg
  
-[лог файл](https://github.com/asm1213/blob/main/dz_otus/DZ_7/log_2.log)
+[лог файл](https://github.com/asm1213/dz_otus/blob/main/DZ_7/log_2.log)
 
 ### Часть3
 Лог и иллюстрация
-[лог файл](https://github.com/asm1213/blob/main/dz_otus/DZ_7/log_3.log)
-![Иллюстрация к проекту](https://github.com/asm1213/blob/main/dz_otus/DZ_7/pics/5.jpg)
+[лог файл](https://github.com/asm1213/dz_otus/blob/main/DZ_7/log_3.log)
+![Иллюстрация к проекту](https://github.com/asm1213/dz_otus/blob/main/DZ_7/pics/5.jpg)
