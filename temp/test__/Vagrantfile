@@ -1,0 +1,76 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$scriptb = <<-SCRIPT
+
+echo "vagrant:vagrant" | chpasswd
+#mkdir -p ~root/.ssh
+#cp ~vagrant/.ssh/auth* ~root/.ssh
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+systemctl restart sshd.service
+
+SCRIPT
+
+$scripta = <<-SCRIPT
+
+echo "vagrant:vagrant" | chpasswd
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+systemctl restart sshd.service
+
+apt update -y
+apt install -y ansible sshpass
+ 
+# cp /vagrant/mnt-cifs.automount /etc/systemd/system
+# cp /vagrant/mnt-cifs.mount /etc/systemd/system
+# systemctl daemon-reload
+# systemctl start mnt-cifs.mount
+# systemctl enable mnt-cifs.automount
+# systemctl reboot
+
+SCRIPT
+
+Vagrant.configure("2") do |config|
+ 
+	config.vm.define "acontr", primary: true do |acontr|
+		acontr.vm.box = "debian/buster64"
+		acontr.vm.hostname = "acontr"
+			acontr.vm.provider "virtualbox" do |vb|
+				vb.memory = "1024"
+				vb.cpus = "2"
+			end
+		acontr.vm.network "private_network", ip: "192.168.34.10"
+		acontr.vm.provision :shell, inline: $scripta
+		acontr.vm.synced_folder ".", "/vagrant", type: "smb", 
+			smb_password: "1213", smb_username: "admin"
+		acontr.ssh.insert_key = false
+		
+	end	
+ 
+	config.vm.define "test1" do |test1|
+		test1.vm.box = "debian/buster64"
+		test1.vm.hostname = "test1"
+			test1.vm.provider "virtualbox" do |vb|
+				vb.memory = "512"
+				vb.cpus = "1"
+			end
+		test1.vm.network "private_network", ip: "192.168.34.11"
+		test1.vm.provision :shell, inline: $scriptb
+		test1.vm.synced_folder ".", "/vagrant", disabled: true
+		test1.ssh.insert_key = false
+	end	
+ 
+	config.vm.define "test2" do |test2|
+		test2.vm.box = "debian/buster64"
+		test2.vm.hostname = "test2"
+			test2.vm.provider "virtualbox" do |vb|
+				vb.memory = "512"
+				vb.cpus = "1"
+			end
+		test2.vm.network "private_network", ip: "192.168.34.12"
+		test2.vm.provision :shell, inline: $scriptb
+		test2.vm.synced_folder ".", "/vagrant", disabled: true
+		test2.ssh.insert_key = false
+	end	
+ 
+ 
+end

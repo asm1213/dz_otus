@@ -1,0 +1,41 @@
+---
+- name: Config Eth
+  hosts: centralServer
+  become: true
+  tasks:
+    - name: Copy eth1 
+      copy:
+        src: /vagrant/confs/ifcfg-eth1-cserv
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+    - name: Copy eth0 
+      copy:
+        src: /vagrant/confs/ifcfg-eth0
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+    - name: Install EPEL Repo
+      yum:
+        name: epel-release
+        state: present
+    - name: NGINX
+      yum:
+        name: nginx
+        state: latest
+      notify:
+        - restart nginx
+  handlers:
+    - name: restart network service
+      service:
+        name: network
+        state: restarted
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes

@@ -1,0 +1,32 @@
+---
+- name: Config Eth
+  hosts: inetRouter2
+  become: true
+  tasks:
+    - name: ip forward    
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+    - name: add static route 
+      copy:
+        src: /vagrant/confs/route-eth1-inetrout2
+        dest: /etc/sysconfig/network-scripts/route-eth1
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+    - name: enable SNAT via iptables
+      ansible.builtin.iptables:
+        table: nat
+        chain: POSTROUTING
+        jump: SNAT
+        out_interface: eth0
+        to_source: 10.0.2.15    
+  handlers:
+    - name: restart network service
+      service:
+        name: network
+        state: restarted

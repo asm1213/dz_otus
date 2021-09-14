@@ -1,0 +1,33 @@
+---
+- name: Config Eth
+  hosts: centralRouter
+  become: true
+  tasks:
+    - name: Copy eth1 
+      copy:
+        src: /vagrant/confs/ifcfg-eth1-crout
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+    - name: Copy eth0 
+      copy:
+        src: /vagrant/confs/ifcfg-eth0
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+    - name: ip forward    
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+  handlers:
+    - name: restart network service
+      service:
+        name: network
+        state: restarted
