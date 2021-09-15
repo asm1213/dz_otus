@@ -6,8 +6,27 @@
     - name: Install iptables
       package:
         name:
+          - iptables
           - iptables-services
         state: latest
+    - name: enable iptables
+      service:
+        name: iptables
+        state: started
+        enabled: yes
+    - name: Flush iptables
+      iptables:
+        flush: yes
+    - name: enable SNAT via iptables
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        jump: SNAT
+        out_interface: eth0
+        to_source: 10.0.2.15
+    - name: add knocking port
+      become: yes
+      shell: iptables-restore < /vagrant/confs/iptables.rules
     - name: ip forward    
       sysctl:
         name: net.ipv4.ip_forward
@@ -23,46 +42,13 @@
         group: vagrant
       notify:
         - restart network service    
-    - name: enable SNAT via iptables
-      iptables:
-        table: nat
-        chain: POSTROUTING
-        jump: SNAT
-        out_interface: eth0
-        to_source: 10.0.2.15
     - name: Ensure network is running
       service:
         name: network
         state: started
-    - name: enable iptables
-      service:
-        name: iptables
-        state: started
-        enabled: yes
-    - name: Flush iptables
-      iptables:
-        flush: yes
-    - name: add knocking port
-      command: iptables-restore < /vagrant/confs/iptables.rules
-      notify: 
-        - iptables save
-    - name: add ssh password auth
-      command: sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-      #warn: no
-      notify: 
-        - restart sshd
-      
   handlers:
     - name: restart network service
       service:
         name: network
         state: restarted
-    - name: restart sshd
-      service: 
-        name: sshd
-        state: restarted
-    - name: iptables save
-      service:
-        name: iptables
-        state: started
-        arguments: save
+    

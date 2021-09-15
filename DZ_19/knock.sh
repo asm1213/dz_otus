@@ -1,4 +1,5 @@
 #!/bin/bash
+#chmod + x knock.sh && ./knock.sh <ip address> 8881 7777 9991
 HOST=$1
 shift
 for ARG in "$@"

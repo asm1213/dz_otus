@@ -3,6 +3,11 @@
   hosts: centralRouter
   become: true
   tasks:
+    - name: install nmap
+      package:
+        name:
+        - nmap
+        state: latest
     - name: Copy eth1 
       copy:
         src: /vagrant/confs/ifcfg-eth1-crout
