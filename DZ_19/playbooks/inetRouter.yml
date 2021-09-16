@@ -3,6 +3,9 @@
   hosts: inetRouter
   become: true
   tasks:
+    - name: conf ssh
+      become: yes 
+      shell: echo 'vagrant:vagrant' | chpasswd && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config && systemctl restart sshd.service
     - name: Install iptables
       package:
         name:

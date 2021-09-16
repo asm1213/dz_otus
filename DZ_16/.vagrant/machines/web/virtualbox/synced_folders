@@ -1,1 +1,0 @@
-{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"D:/Projects/NIX/dz_otus/DZ_16","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
