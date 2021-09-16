@@ -1,0 +1,70 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$scripthosts = <<-SCRIPT
+
+echo "vagrant:vagrant" | chpasswd
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+systemctl restart sshd.service
+
+SCRIPT
+
+$scriptans = <<-SCRIPT
+
+echo "vagrant:vagrant" | chpasswd
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+systemctl restart sshd.service
+
+apt update -y
+apt install -y ansible sshpass
+cp /vagrant/ansible.cfg /etc/ansible/
+SCRIPT
+
+Vagrant.configure("2") do |config|
+ 
+	config.vm.define "contr", primary: true do |contr|
+		contr.vm.box = "debian/buster64"
+		contr.vm.hostname = "contr"
+			contr.vm.provider "virtualbox" do |vb|
+				vb.memory = "1024"
+				vb.cpus = "1"
+			end
+		contr.vm.network "private_network", ip: "192.168.34.10",
+			virtualbox__intnet: true,
+			name: "onlyVM"
+		contr.vm.provision :shell, inline: $scriptans
+		contr.vm.synced_folder ".", "/vagrant", type: "smb", 
+			smb_password: "vagrant", smb_username: "vagrant"
+		contr.ssh.insert_key = false
+	end	
+ 
+	config.vm.define "web" do |web|
+		web.vm.box = "centos/7"
+		web.vm.hostname = "web"
+			web.vm.provider "virtualbox" do |vb|
+				vb.memory = "512"
+				vb.cpus = "1"
+			end
+		web.vm.network "private_network", ip: "192.168.34.11",
+			virtualbox__intnet: true,
+			name: "onlyVM"
+		web.vm.provision :shell, inline: $scripthosts
+		web.ssh.insert_key = false
+	end	
+ 
+	config.vm.define "log" do |log|
+		log.vm.box = "centos/7"
+		log.vm.hostname = "log"
+			log.vm.provider "virtualbox" do |vb|
+				vb.memory = "512"
+				vb.cpus = "1"
+			end
+		log.vm.network "private_network", ip: "192.168.34.12",
+			virtualbox__intnet: true,
+			name: "onlyVM"
+		log.vm.provision :shell, inline: $scripthosts
+		log.ssh.insert_key = false
+	end	
+ 
+ 
+end
