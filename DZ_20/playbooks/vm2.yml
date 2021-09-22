@@ -1,0 +1,38 @@
+---
+- name: Config Eth
+  hosts: vm2
+  become: true
+  tasks:
+    - name: install nmap
+      package:
+        name:
+        - frr
+        state: latest
+    - name: Copy eth1 
+      copy:
+        src: /vagrant/confs/ifcfg-vlan10_vm2
+        dest: /etc/sysconfig/network-scripts/ifcfg-vlan10
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+    - name: Copy eth0 
+      copy:
+        src: /vagrant/confs/ifcfg-eth0
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+    - name: ip forward    
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+  handlers:
+    - name: restart network service
+      service:
+        name: NetworkManager
+        state: restarted
