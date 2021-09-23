@@ -9,22 +9,22 @@
         - frr
         state: latest
     - name: enable ospfd
-      become: yes
       replace:
         path: /etc/frr/daemons
         regexp: 'ospfd=no'
         replace: 'ospfd=yes'
+      notify: restart frr
     - name: copy zebra conf
-      vars:
       copy:
         src: /vagrant/confs/zebra.conf
         dest: /etc/frr/zebra.conf
         owner: frr
         group: frr
+      notify: restart frr
     - name: copy ospfd conf
       vars:
-        int1: vlan20@eth1
-        int2: vlan30@eth1
+        int1: vlan20
+        int2: vlan30
         network1: 192.168.20.0/24
         network2: 192.168.30.0/24
       template:
@@ -32,6 +32,7 @@
         dest: /etc/frr/ospfd.conf
         owner: frr
         group: frr
+      notify: restart frr
     - name: start and enable frr.service
       systemd:
         name: frr
@@ -63,14 +64,6 @@
         group: vagrant
       notify:
         - restart network service
-    - name: Copy eth0 
-      copy:
-        src: /vagrant/confs/ifcfg-eth0
-        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
-        owner: vagrant
-        group: vagrant
-      notify:
-        - restart network service
     - name: ip forward    
       sysctl:
         name: net.ipv4.ip_forward
@@ -82,4 +75,8 @@
     - name: restart network service
       systemd:
         name: NetworkManager.service
+        state: restarted
+    - name: restart frr
+      systemd:
+        name: frr
         state: restarted
