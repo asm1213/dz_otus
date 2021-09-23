@@ -1,6 +1,6 @@
 ---
 - name: Config Eth
-  hosts: vm1
+  hosts: vm3
   become: true
   tasks:
     - name: install frr
@@ -15,7 +15,7 @@
         enabled: yes
     - name: create vlan 10
       vars:
-        vlan_n: 10
+        vlan_n: 30
         eth_name: eth1
         ip: 192.168.10.10
         mask: 255.255.255.0
@@ -28,9 +28,9 @@
         - restart network service
     - name: create vlan 30
       vars:
-        vlan_n: 30
+        vlan_n: 20
         eth_name: eth1
-        ip: 192.168.30.11
+        ip: 192.168.20.11
         mask: 255.255.255.0
       template:
         src: /vagrant/templates/vlan.conf.j2

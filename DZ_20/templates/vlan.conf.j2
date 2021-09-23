@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+ONBOOT=yes
+TYPE=VLAN
+VLAN=yes
+VLAN_NAME_TYPE=VLAN_PLUS_VID_NO_PAD
+DEVICE=vlan{{ vlan_n }}
+PHYSDEV={{ eth_name }}
+VLAN_ID={{ vlan_n }}
+BOOTPROTO=static
+IPADDR={{ ip }}
+NETMASK={{ mask }}

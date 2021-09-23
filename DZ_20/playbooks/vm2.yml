@@ -3,15 +3,38 @@
   hosts: vm2
   become: true
   tasks:
-    - name: install nmap
+    - name: install frr
       package:
         name:
         - frr
         state: latest
-    - name: Copy eth1 
-      copy:
-        src: /vagrant/confs/ifcfg-vlan10_vm2
+    - name: start and enable frr.service
+      systemd:
+        name: frr
+        state: started
+        enabled: yes
+    - name: create vlan 10
+      vars:
+        vlan_n: 10
+        eth_name: eth1
+        ip: 192.168.10.11
+        mask: 255.255.255.0
+      template:
+        src: /vagrant/templates/vlan.conf.j2
         dest: /etc/sysconfig/network-scripts/ifcfg-vlan10
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+    - name: create vlan 30
+      vars:
+        vlan_n: 20
+        eth_name: eth1
+        ip: 192.168.20.10
+        mask: 255.255.255.0
+      template:
+        src: /vagrant/templates/vlan.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
         owner: vagrant
         group: vagrant
       notify:
@@ -31,8 +54,12 @@
         sysctl_set: yes
         state: present
         reload: yes
+    - name: del def route to NAT 
+      shell: ip route delete default
+      args:
+        warn: no
   handlers:
     - name: restart network service
-      service:
-        name: NetworkManager
+      systemd:
+        name: NetworkManager.service
         state: restarted
