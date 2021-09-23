@@ -8,6 +8,30 @@
         name:
         - frr
         state: latest
+    - name: enable ospfd
+      become: yes
+      replace:
+        path: /etc/frr/daemons
+        regexp: 'ospfd=no'
+        replace: 'ospfd=yes'
+    - name: copy zebra conf
+      vars:
+      copy:
+        src: /vagrant/confs/zebra.conf
+        dest: /etc/frr/zebra.conf
+        owner: frr
+        group: frr
+    - name: copy ospfd conf
+      vars:
+        int1: vlan20@eth1
+        int2: vlan30@eth1
+        network1: 192.168.20.0/24
+        network2: 192.168.30.0/24
+      template:
+        src: /vagrant/templates/ospfd.conf.j2
+        dest: /etc/frr/ospfd.conf
+        owner: frr
+        group: frr
     - name: start and enable frr.service
       systemd:
         name: frr
@@ -17,11 +41,11 @@
       vars:
         vlan_n: 30
         eth_name: eth1
-        ip: 192.168.10.10
+        ip: 192.168.30.10
         mask: 255.255.255.0
       template:
         src: /vagrant/templates/vlan.conf.j2
-        dest: /etc/sysconfig/network-scripts/ifcfg-vlan10
+        dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
         owner: vagrant
         group: vagrant
       notify:
@@ -54,10 +78,6 @@
         sysctl_set: yes
         state: present
         reload: yes
-    - name: del def route to NAT 
-      shell: ip route delete default
-      args:
-        warn: no
   handlers:
     - name: restart network service
       systemd:

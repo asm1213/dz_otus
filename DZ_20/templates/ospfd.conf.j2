@@ -1,0 +1,33 @@
+! -*- ospf -*-
+!
+! OSPFd sample configuration file
+!
+!
+hostname ospfd
+password zebra
+!enable password please-set-at-here
+!
+!router ospf
+!  network 192.168.1.0/24 area 0
+!
+log stdout
+
+interface {{ int1 }}@eth1
+ip ospf mtu-ignore
+! ip ospf network point-to-point
+! ip ospf cost 45
+ip ospf hello-interval 5
+ip ospf dead-interval 10
+
+interface {{ int2 }}@eth1
+ip ospf mtu-ignore
+! ip ospf network point-to-point
+! ip ospf cost 45
+ip ospf hello-interval 5
+ip ospf dead-interval 10
+
+router ospf
+network {{ network1 }} area 0
+network {{ network2 }} area 0
+
+default-information originate always
