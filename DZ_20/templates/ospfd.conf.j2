@@ -12,14 +12,14 @@ password zebra
 !
 log stdout
 
-interface {{ int1 }}@eth1
+interface {{ int1 }}
 ip ospf mtu-ignore
 ! ip ospf network point-to-point
 ! ip ospf cost 45
 ip ospf hello-interval 5
 ip ospf dead-interval 10
 
-interface {{ int2 }}@eth1
+interface {{ int2 }}
 ip ospf mtu-ignore
 ! ip ospf network point-to-point
 ! ip ospf cost 45
