@@ -124,6 +124,6 @@ Wildcard Mask:	0.0.0.63
 ```
 
 Реализовал схему
-![Иллюстрация к проекту](https://github.com/asm1213/DZ_18/blob/main/net.jpg)
+![Иллюстрация к проекту](https://github.com/asm1213/dz_otus/blob/main/DZ_18/net.jpg)
 
 при желании можно добавить дополнительный оффис.
