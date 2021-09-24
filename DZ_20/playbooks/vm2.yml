@@ -71,6 +71,14 @@
         sysctl_set: yes
         state: present
         reload: yes
+    - name: remove def routing to NAT eth0
+      lineinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth0
+        insertafter: '^PERSISTENT_DHCLIENT="yes"'
+        line: 'DEFROUTE=no'
+      notify:
+        - restart network service
+        - flush route cache
   handlers:
     - name: restart network service
       systemd:
@@ -80,3 +88,6 @@
       systemd:
         name: frr
         state: restarted
+    - name: flush route cache
+      become: yes
+      shell: ip route flush cache
