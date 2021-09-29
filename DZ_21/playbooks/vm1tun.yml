@@ -1,0 +1,28 @@
+---
+- name: VM1 OVPN_TUN
+  hosts: vm1
+  become: yes
+  tasks:
+    - name: install apps
+      package:
+        name:
+        - epel-release
+        - openvpn
+        - easy-rsa
+        state: latest
+    - name: copy conf
+      vars:
+        serverport: 1194
+        protocol: udp
+        dev: tun
+        mtu: 1500
+        mssfix: 1300
+        capath: /etc/openvpn
+        serverip: 172.16.0.0 255.255.255.0
+        #route: 
+        #clientroute:
+      template:
+        src: /vagrant/templates/server.conf.j2
+        dest: /etc/openvpn/server.conf
+   
+  
