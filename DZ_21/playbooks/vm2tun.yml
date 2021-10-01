@@ -1,6 +1,6 @@
 ---
-- name: VM1 OVPN_TUN
-  hosts: vm1
+- name: VM2 OVPN_TUN
+  hosts: vm2
   become: yes
   tasks:
     - name: install apps
@@ -10,11 +10,11 @@
         - openvpn
         state: latest
     - name: copy cert
-      shell: cp /vagrant/crt/server/* /etc/openvpn/
+      shell: cp /vagrant/crt/client/* /etc/openvpn/
     - name: copy conf
       copy: 
-        src: /vagrant/confs/servertap.conf
-        dest: /etc/openvpn/server.conf
+        src: /vagrant/confs/clienttap.conf
+        dest: /etc/openvpn/client.conf
     - name: start and enable vpn 
       systemd:
         name: openvpn@server
