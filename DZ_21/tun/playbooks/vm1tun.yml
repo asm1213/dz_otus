@@ -9,8 +9,6 @@
         - epel-release
         - openvpn
         state: latest
-    - name: copy cert
-      shell: cp /vagrant/crt/server/* /etc/openvpn/
     - name: copy conf
       copy: 
         src: /vagrant/confs/servertun.conf
