@@ -1,0 +1,23 @@
+---
+- name: VM2 OVPN_TUN
+  hosts: vm2
+  become: yes
+  tasks:
+    - name: install apps
+      package:
+        name:
+        - epel-release
+        - openvpn
+        state: latest
+    # - name: copy cert
+    #   shell: cp /vagrant/crt/client/* /etc/openvpn/
+    - name: copy conf
+      copy: 
+        src: /vagrant/confs/clienttap.conf
+        dest: /etc/openvpn/client.conf
+    - name: start and enable vpn 
+      systemd:
+        name: openvpn@client
+        state: started
+        enabled: yes  
+  
