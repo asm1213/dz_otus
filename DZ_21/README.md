@@ -1,7 +1,13 @@
 
-# 
+# ДЗ 21 OPENVPN
+## TUN и TAP
+### в папках tun и tap соотвествующие стенды
+Основноное отличие это работа на разных уровнях OSI tap - l2, tun -l3
+TAP - броадкасты, arp, подходит для бриджа
+TUN - для  
 
-# Генерация ключей и сертификатов
+
+## Генерация ключей и сертификатов
 ### gen CA
 ```
 openssl genrsa -out ca.key 4096
@@ -23,4 +29,7 @@ openssl x509 -req -days 365  -CA ca.crt -CAkey ca.key -set_serial 01 -extensions
 ```
 openssl dhparam -out dhparams.pem 2048
 ```
+Для клиента на windows скачал клиент версии 3, в файле client.conf интегрировал сертификаты и изменил расширение на ovpn.
+Подключение прошло
 
+![Иллюстрация к проекту](https://github.com/asm1213/dz_otus/blob/main/DZ_21/ras/pic1.png)
