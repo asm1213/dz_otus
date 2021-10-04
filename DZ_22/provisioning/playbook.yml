@@ -3,12 +3,12 @@
   become: yes
   tasks:
   - name: install packages
-    yum: name={{ item }} state=latest 
-    with_items:
-      - bind
-      - bind-utils
-      - ntp
-
+    package: 
+      name:
+        - bind
+        - bind-utils
+        - ntp
+      state: latest
   - name: copy transferkey to all servers and the client
     copy: src=named.zonetransfer.key dest=/etc/named.zonetransfer.key owner=root group=named mode=0644
 
