@@ -1,0 +1,13 @@
+[all:vars]
+ansible_connection=ssh
+ansible_user=vagrant
+ansible_ssh_pass=vagrant
+
+[mystand]
+ns01 ansible_host=192.168.50.10
+ns02 ansible_host=192.168.50.11
+client ansible_host=192.168.50.15
+client2 ansible_host=192.168.50.16
+
+[ansiblecontroller]
+ansiblecontroller ansible_host=192.168.50.254

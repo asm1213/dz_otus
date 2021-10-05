@@ -1,0 +1,13 @@
+[Unit]
+  Description=CIFS
+  Requires=network-online.target
+  After=network-online.service
+
+[Mount]
+  What=//адрес/share$
+  Where=/mnt/cifs
+  Options=user=******,password=******
+  Type=cifs
+
+[Install]
+  WantedBy=multi-user.target

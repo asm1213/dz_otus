@@ -3,17 +3,15 @@
 
 Vagrant.configure(2) do |config|
   config.vm.box = "centos/7"
-
-  config.vm.provision "ansible_local" do |ansible|
-    #ansible.verbose = "vvv"
-    ansible.playbook = "provisioning/playbook.yml"
-    ansible.become = "yes"
-  end
   
-  config.vm.provider "virtualbox" do |v|
-	  v.memory = 512
-  end
-
+  config.ssh.insert_key = "false"
+   
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "vagrant:vagrant" | chpasswd
+    sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+    systemctl restart sshd.service
+  SHELL
+ 
   config.vm.define "ns01" do |ns01|
     ns01.vm.network "private_network", ip: "192.168.50.10", virtualbox__intnet: "dns"
     ns01.vm.hostname = "ns01"
@@ -31,5 +29,17 @@ Vagrant.configure(2) do |config|
   config.vm.define "client2" do |client2|
     client2.vm.network "private_network", ip: "192.168.50.16", virtualbox__intnet: "dns"
     client2.vm.hostname = "client2"
+  end
+
+  config.vm.define "ansiblecontroller" do |ansiblecontroller|
+    ansiblecontroller.vm.network "private_network", ip: "192.168.50.254", virtualbox__intnet: "dns"
+    ansiblecontroller.vm.hostname = "ansiblecontroller"
+    ansiblecontroller.vm.provision :ansible_local do |ansible|
+      ansible.playbook       = "provisioning/playbook.yml"
+      #ansible.verbose        = true
+      ansible.install        = true
+      ansible.limit          = "mystand"
+      ansible.inventory_path = "hosts"
+    end
   end
 end
