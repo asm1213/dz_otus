@@ -9,5 +9,9 @@ ns02 ansible_host=192.168.50.11
 client ansible_host=192.168.50.15
 client2 ansible_host=192.168.50.16
 
-[ansiblecontroller]
+[controller]
 ansiblecontroller ansible_host=192.168.50.254
+
+[ns]
+ns01
+ns02

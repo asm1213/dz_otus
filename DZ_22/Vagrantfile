@@ -36,7 +36,6 @@ Vagrant.configure(2) do |config|
     ansiblecontroller.vm.hostname = "ansiblecontroller"
     ansiblecontroller.vm.provision :ansible_local do |ansible|
       ansible.playbook       = "provisioning/playbook.yml"
-      #ansible.verbose        = true
       ansible.install        = true
       ansible.limit          = "mystand"
       ansible.inventory_path = "hosts"
