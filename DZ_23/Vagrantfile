@@ -1,0 +1,67 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    
+    config.vm.box = "centos/7"
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = "256"
+        vb.cpus = "1"
+    
+    config.ssh.insert_key = "false"
+   
+    config.vm.provision "shell", inline: <<-SHELL
+        echo "vagrant:vagrant" | chpasswd
+        sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+        systemctl restart sshd.service
+        SHELL
+
+	config.vm.define "inetRouter", primary: true do |inetRouter|
+		inetRouter.vm.hostname = "inetRouter"
+		inetRouter.vm.network "private_network", ip: "192.168.50.15", virtualbox__intnet: true, name: "provision_net"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "routernet"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "routernet"
+	end	
+    
+    config.vm.define "centralRouter", primary: true do |centralRouter|
+		centralRouter.vm.hostname = "centralRouter"
+		centralRouter.vm.network "private_network", ip: "192.168.50.14", virtualbox__intnet: true, name: "provision_net"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "office1"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "routernet"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "routernet"
+	end	
+	
+    config.vm.define "testClient1", primary: true do |centralServer|
+		testClient1.vm.hostname = "testClient1"
+		testClient1.vm.network "private_network", ip: "192.168.50.13", virtualbox__intnet: true, name: "provision_net"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "office1"
+	end	
+				
+    config.vm.define "testClient2", primary: true do |centralServer|
+		testClient2.vm.hostname = "testClient2"
+		testClient2.vm.network "private_network", ip: "192.168.50.12", virtualbox__intnet: true, name: "provision_net"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "office1"
+	end	
+
+    config.vm.define "testServer1", primary: true do |centralServer|
+		testServer1.vm.hostname = "testServer1"
+		testServer1.vm.network "private_network", ip: "192.168.50.11", virtualbox__intnet: true, name: "provision_net"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "office1"
+	end	
+
+    config.vm.define "testServer2", primary: true do |centralServer|
+		testServer2.vm.hostname = "testServer2"
+		testServer2.vm.network "private_network", ip: "192.168.50.10", virtualbox__intnet: true, name: "provision_net"
+        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "office1"
+	end	
+
+    config.vm.define "ansiblecontroller" do |ansiblecontroller|
+        ansiblecontroller.vm.network "private_network", ip: "192.168.50.254", virtualbox__intnet: "provision_net"
+        ansiblecontroller.vm.hostname = "ansiblecontroller"
+        ansiblecontroller.vm.provision :ansible_local do |ansible|
+          ansible.playbook       = "provisioning/playbook.yml"
+          ansible.install        = true
+          ansible.limit          = "mystand"
+          ansible.inventory_path = "hosts"
+        end
+      end
