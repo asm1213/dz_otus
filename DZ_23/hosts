@@ -12,4 +12,4 @@ centralRouter   ansible_host=192.168.50.14
 inetRouter      ansible_host=192.168.50.15
 
 [controller]
-ansiblecontroller ansible_host=192.168.50.254
+ansiblecontroller ansible_host=192.168.50.50

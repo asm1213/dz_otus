@@ -1,0 +1,200 @@
+---
+- name: Config testClient1
+  hosts: testClient1
+  become: true
+  tasks: 
+    - name: create vlan 20
+      vars:
+        vlan_n: 20
+        eth_name: eth2
+        ip: 10.10.10.254
+        mask: 255.255.255.0
+      template:
+        src: /vagrant/provisioning/templates/vlan.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+  handlers:
+    - name: restart network service
+      systemd:
+        name: NetworkManager.service
+        state: restarted
+- name: Config testClient2
+  hosts: testClient2
+  become: true
+  tasks: 
+    - name: create vlan 30
+      vars:
+        vlan_n: 30
+        eth_name: eth2
+        ip: 10.10.10.254
+        mask: 255.255.255.0
+      template:
+        src: /vagrant/provisioning/templates/vlan.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+  handlers:
+    - name: restart network service
+      systemd:
+        name: NetworkManager.service
+        state: restarted
+- name: Config testServer1
+  hosts: testServer1
+  become: true
+  tasks: 
+    - name: create vlan 20
+      vars:
+        vlan_n: 20
+        eth_name: eth2
+        ip: 10.10.10.1
+        mask: 255.255.255.0
+      template:
+        src: /vagrant/provisioning/templates/vlan.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+  handlers:
+    - name: restart network service
+      systemd:
+        name: NetworkManager.service
+        state: restarted
+- name: Config testServer2
+  hosts: testServer2
+  become: true
+  tasks: 
+    - name: create vlan 30
+      vars:
+        vlan_n: 30
+        eth_name: eth2
+        ip: 10.10.10.1
+        mask: 255.255.255.0
+      template:
+        src: /vagrant/provisioning/templates/vlan.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
+  handlers:
+    - name: restart network service
+      systemd:
+        name: NetworkManager.service
+        state: restarted
+- name: config inetRouter
+  hosts: inetRouter
+  become: true
+  tasks:
+    - name: Install iptables
+      package:
+        name:
+          - iptables
+          - iptables-services
+        state: latest
+    - name: enable iptables
+      service:
+        name: iptables
+        state: started
+        enabled: yes
+    - name: Flush iptables
+      iptables:
+        flush: yes
+    - name: enable SNAT via iptables
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        jump: SNAT
+        out_interface: eth0
+        to_source: 10.0.2.15
+    - name: ip forward    
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+      notify:
+        - restart network service
+    - name: add eth2 to bond
+      vars: 
+        dev: eth2 
+      template: 
+        src: /vagrant/provisioning/templates/ethbond.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth2
+    - name: add eth3 to bond
+      vars: 
+        dev: eth3
+      template: 
+        src: /vagrant/provisioning/templates/ethbond.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth3
+    - name: create bond0
+      vars: 
+        address: 192.168.40.11
+      template: 
+        src: /vagrant/provisioning/templates/bond.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-bond0
+      notify: 
+        - restart network service
+  handlers:
+    - name: restart network service
+      service:
+        name: network
+        state: restarted  
+- name: config centralRouter
+  hosts: centralRouter
+  become: true
+  tasks:
+    - name: add eth2 to bond
+      vars: 
+        dev: eth2 
+      template: 
+        src: /vagrant/provisioning/templates/ethbond.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth2
+    - name: add eth3 to bond
+      vars: 
+        dev: eth3
+      template: 
+        src: /vagrant/provisioning/templates/ethbond.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth3
+    - name: create bond0
+      vars: 
+        address: 192.168.40.10
+      template: 
+        src: /vagrant/provisioning/templates/bond.conf.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-bond0
+      notify: 
+        - restart network service
+    # - name: Copy eth1 
+    #   copy:
+    #     src: /vagrant/confs/ifcfg-eth1-crout
+    #     dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+    #     owner: vagrant
+    #     group: vagrant
+    #   notify:
+    #     - restart network service
+    # - name: Copy eth0 
+    #   copy:
+    #     src: /vagrant/confs/ifcfg-eth0
+    #     dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+    #     owner: vagrant
+    #     group: vagrant
+    #   notify:
+    #     - restart network service
+    - name: ip forward    
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+  handlers:
+    - name: restart network service
+      service:
+        name: network
+        state: restarted
