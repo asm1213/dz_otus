@@ -16,11 +16,11 @@
         group: vagrant
       notify:
         - restart network service
-      handlers:
-        - name: restart network service
-          systemd:
-            name: NetworkManager.service
-            state: restarted
+  handlers:
+    - name: restart network service
+      systemd:
+        name: NetworkManager.service
+        state: restarted
 - name: Config testClient2
   hosts: testClient2
   become: true
@@ -38,11 +38,11 @@
         group: vagrant
       notify:
         - restart network service
-      handlers:
-        - name: restart network service
-          systemd:
-            name: NetworkManager.service
-            state: restarted
+  handlers:
+    - name: restart network service
+      systemd:
+        name: NetworkManager.service
+        state: restarted
 - name: Config testServer1
   hosts: testServer1
   become: true
@@ -58,13 +58,15 @@
         dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
         owner: vagrant
         group: vagrant
+      tags:
+        server1
       notify:
         - restart network service
-      handlers:
-        - name: restart network service
-          systemd:
-            name: NetworkManager.service
-            state: restarted
+  handlers:
+    - name: restart network service
+      systemd:
+        name: NetworkManager.service
+        state: restarted
 - name: Config testServer2
   hosts: testServer2
   become: true
@@ -80,13 +82,15 @@
         dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
         owner: vagrant
         group: vagrant
+      tags: 
+        server2
       notify:
         - restart network service
-      handlers:
-        - name: restart network service
-          systemd:
-            name: NetworkManager.service
-            state: restarted
+  handlers:
+    - name: restart network service
+      systemd:
+        name: NetworkManager.service
+        state: restarted
 - name: config inetRouter
   hosts: inetRouter
   become: true
@@ -141,11 +145,11 @@
         dest: /etc/sysconfig/network-scripts/ifcfg-bond0
       notify: 
         - restart network service
-      handlers:
-        - name: restart network service
-          service:
-            name: network
-            state: restarted  
+  handlers:
+    - name: restart network service
+      service:
+        name: network
+        state: restarted  
 - name: config centralRouter
   hosts: centralRouter
   become: true
@@ -170,22 +174,14 @@
         dest: /etc/sysconfig/network-scripts/ifcfg-bond0
       notify: 
         - restart network service
-    # - name: Copy eth1 
-    #   copy:
-    #     src: /vagrant/confs/ifcfg-eth1-crout
-    #     dest: /etc/sysconfig/network-scripts/ifcfg-eth1
-    #     owner: vagrant
-    #     group: vagrant
-    #   notify:
-    #     - restart network service
-    # - name: Copy eth0 
-    #   copy:
-    #     src: /vagrant/confs/ifcfg-eth0
-    #     dest: /etc/sysconfig/network-scripts/ifcfg-eth0
-    #     owner: vagrant
-    #     group: vagrant
-    #   notify:
-    #     - restart network service
+    - name: Copy eth0 
+      copy:
+        src: /vagrant/provisioning/confs/ifcfg-eth0
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        owner: vagrant
+        group: vagrant
+      notify:
+        - restart network service
     - name: ip forward    
       sysctl:
         name: net.ipv4.ip_forward
@@ -193,8 +189,8 @@
         sysctl_set: yes
         state: present
         reload: yes
-      handlers:
-        - name: restart network service
-          service:
-            name: network
-            state: restarted
+  handlers:
+    - name: restart network service
+      service:
+        name: network
+        state: restarted
