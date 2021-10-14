@@ -1,4 +1,4 @@
-равести вланами
+развести вланами
 testClient1 <-> testServer1
 testClient2 <-> testServer2
 
