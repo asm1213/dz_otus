@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    
+    config.vm.box = "centos/7"
+    
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = "256"
+        vb.cpus = "1"
+    end
+
+    config.ssh.insert_key = "false"
+   
+    config.vm.provision "shell", inline: <<-SHELL
+        echo "vagrant:vagrant" | chpasswd
+        sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+        systemctl restart sshd.service
+        SHELL
+    config.vm.define "dc", primary: true do |dc|
+            dc.vm.hostname = "dc"
+            dc.vm.network "private_network", ip: "192.168.50.10", virtualbox__intnet: true, name: "provision_net"
+         end	
+    config.vm.define "client", primary: true do |client|
+            client.vm.hostname = "client"
+            client.vm.network "private_network", ip: "192.168.50.11", virtualbox__intnet: true, name: "provision_net"
+         end
+    config.vm.define "ansiblecontroller", primary: true do |ansiblecontroller|
+            ansiblecontroller.vm.network "private_network", ip: "192.168.50.50", virtualbox__intnet: true, name: "provision_net"
+            ansiblecontroller.vm.hostname = "ansiblecontroller"
+            ansiblecontroller.vm.provision "ansible", run: "always", type: "ansible_local"  do |ansible|
+            ansible.playbook       = "provisioning/playbook.yml"
+            ansible.install        = true
+            ansible.limit          = "mystand"
+            ansible.inventory_path = "hosts"
+            end
+        end      
+end    
