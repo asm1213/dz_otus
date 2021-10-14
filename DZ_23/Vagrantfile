@@ -51,14 +51,15 @@ Vagrant.configure("2") do |config|
         testServer1.vm.network "private_network", virtualbox__intnet: true, name: "office1"
 	end	
 
-    config.vm.define "testServer2", primary: true do |testServer2|
-		testServer2.vm.hostname = "testServer2"
-		testServer2.vm.network "private_network", ip: "192.168.50.10", virtualbox__intnet: true, name: "provision_net"
-        testServer2.vm.network "private_network", virtualbox__intnet: true, name: "office1"
+    config.vm.define "testServer2", primary: true do |testServer1|
+		testServer1.vm.hostname = "testServer2"
+		testServer1.vm.network "private_network", ip: "192.168.50.10", virtualbox__intnet: true, name: "provision_net"
+        testServer1.vm.network "private_network", virtualbox__intnet: true, name: "office1"
 	end	
+    
 
     config.vm.define "ansiblecontroller", primary: true do |ansiblecontroller|
-        ansiblecontroller.vm.network "private_network", ip: "192.168.50.10", virtualbox__intnet: true, name: "provision_net"
+        ansiblecontroller.vm.network "private_network", ip: "192.168.50.50", virtualbox__intnet: true, name: "provision_net"
         ansiblecontroller.vm.hostname = "ansiblecontroller"
         ansiblecontroller.vm.provision "ansible", run: "always", type: "ansible_local"  do |ansible|
           ansible.playbook       = "provisioning/playbook.yml"

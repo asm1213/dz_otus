@@ -80,8 +80,8 @@
       template:
         src: /vagrant/provisioning/templates/vlan.conf.j2
         dest: /etc/sysconfig/network-scripts/ifcfg-vlan{{ vlan_n }}
-        owner: vagrant
-        group: vagrant
+        #owner: vagrant
+        #group: vagrant
       tags: 
         server2
       notify:
