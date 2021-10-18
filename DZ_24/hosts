@@ -3,9 +3,24 @@ ansible_connection=ssh
 ansible_user=vagrant
 ansible_ssh_pass=vagrant
 
-[mystand]
-dc              ansible_host=192.168.50.10
-client          ansible_host=192.168.50.15
+[ipaserver]
+dc.otus.local       ansible_host=192.168.50.10
+
+[ipaserver:vars]
+ipaadmin_password=ADMPassword1
+ipadm_password=DMPassword1
+ipaserver_domain=otus.local
+ipaserver_realm=OTUS.LOCAL
+ipaserver_install_packages=no
+ipaserver_setup_firewalld=no
+
+[ipaclients]
+client.otus.local   ansible_host=192.168.50.15 ipaclient_servers=dc.otus.local
+
+[ipaclients:vars]
+ipaadmin_password=ADMPassword1
+ipaserver_domain=otus.local
+ipaserver_realm=OTUS.LOCAL
 
 [controller]
 ansiblecontroller ansible_host=192.168.50.50
