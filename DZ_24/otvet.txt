@@ -1,0 +1,13 @@
+yes
+dc.otus.local
+otus.local
+OTUS.LOCAL
+password@333
+password@333
+ipa@admin123
+ipa@admin123
+192.168.10.10
+
+no
+no
+yes
