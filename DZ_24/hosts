@@ -8,10 +8,11 @@ ipaadmin_password=ADMPassword1
 ipadm_password=DMPassword1
 ipaserver_domain=otus.local
 ipaserver_realm=OTUS.LOCAL
-ipaserver_setup_firewalld=yes
+ipaserver_setup_firewalld=no
 ipaserver_setup_dns=yes
 ipaserver_no_host_dns=yes
-ipaserver_auto_forwarders=no
+ipaserver_no_forwarders=yes
+ipaserver_no_reverse=yes
 
 [ipaclients:vars]
 ipaadmin_password=ADMPassword1
