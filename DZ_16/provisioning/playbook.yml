@@ -25,8 +25,14 @@
         state: latest
     - name: copy journald conf
       copy:
-        src: /vagrant/conf/systemd-journal-remote.service
-        dest: /etc/systemd
+        src: /vagrant/provisioning/conf/systemd-journal-remote.service
+        dest: /etc/systemd/system
+    - name: enable and start remote log service
+      systemd: 
+        name: systemd-journal-remote.service
+        state: started
+        enabled: true
+        daemon_reload: yes
     - name: create log dir
       file:
         path: /var/log/journal/remote

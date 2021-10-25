@@ -1,13 +1,16 @@
 ---
-- name: Install Nginx Web Server on Debian Family
-  apt:
-    name=nginx
-    state=latest
-  
+- name: Install EPEL Repo package from standart repo
+  yum:
+    name: epel-release
+    state: present
+- name: Install Nginx Web Server
+  package:
+    name:
+      - nginx
+    state: latest
   notify:
     - nginx systemd
-
 - name: Replace nginx.conf
   template:
-    src=templates/nginx.conf
-    dest=/etc/nginx/nginx.conf
+    src: templates/nginx.conf
+    dest: /etc/nginx/nginx.conf
