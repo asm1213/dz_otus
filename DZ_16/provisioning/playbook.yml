@@ -1,0 +1,35 @@
+---
+- name: web server config
+  hosts: web
+  vars:
+    nginx_user: www-data
+  become: true
+  pre_tasks:
+    - name: install journal
+      package: 
+        name:
+          - systemd-journal-gateway
+          - vim 
+        state: latest
+  roles:
+   - nginx
+- name: config log server
+  hosts: log
+  become: true
+  tasks:
+    - name: Install pack
+      package:
+        name:
+          - systemd-journal-gateway
+          - vim
+        state: latest
+    - name: copy journald conf
+      copy:
+        src: /vagrant/conf/systemd-journal-remote.service
+        dest: /etc/systemd
+    - name: create log dir
+      file:
+        path: /var/log/journal/remote
+        state: directory
+        owner: systemd-journal-remote
+        group: systemd-journal-remote

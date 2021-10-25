@@ -1,8 +1,0 @@
----
-- hosts: web
-  vars:
-    nginx_user: www-data
-  become:
-    true
-  roles:
-   - nginx
