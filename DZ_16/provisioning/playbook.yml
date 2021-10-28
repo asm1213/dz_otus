@@ -1,4 +1,29 @@
 ---
+- name: config log server
+  hosts: log
+  become: true
+  tasks:
+    - name: Install pack
+      package:
+        name:
+          - systemd-journal-gateway
+        state: latest
+    - name: copy journald conf
+      copy:
+        src: /vagrant/provisioning/conf/systemd-journal-remote.service
+        dest: /etc/systemd/system
+    - name: create log dir
+      file:
+        path: /var/log/journal/remote
+        state: directory
+        owner: systemd-journal-remote
+        group: systemd-journal-remote
+    - name: enable and start remote log service
+      systemd: 
+        name: systemd-journal-remote.service
+        state: started
+        enabled: true
+        daemon_reload: yes
 - name: web server config
   hosts: web
   vars:
@@ -9,33 +34,51 @@
       package: 
         name:
           - systemd-journal-gateway
-          - vim 
         state: latest
-  roles:
-   - nginx
-- name: config log server
-  hosts: log
-  become: true
-  tasks:
-    - name: Install pack
-      package:
-        name:
-          - systemd-journal-gateway
-          - vim
-        state: latest
-    - name: copy journald conf
-      copy:
-        src: /vagrant/provisioning/conf/systemd-journal-remote.service
-        dest: /etc/systemd/system
-    - name: enable and start remote log service
-      systemd: 
-        name: systemd-journal-remote.service
-        state: started
-        enabled: true
-        daemon_reload: yes
     - name: create log dir
       file:
         path: /var/log/journal/remote
         state: directory
         owner: systemd-journal-remote
         group: systemd-journal-remote
+  roles:
+   - nginx
+  post_tasks:
+    - name: gen crit journal service
+      copy:
+        src: /vagrant/provisioning/conf/clientevents.service
+        dest: /etc/systemd/system
+    - name: audit send to journald
+      copy:
+        src: /vagrant/provisioning/conf/nginx_conf_audit.service
+        dest: /etc/systemd/system
+    - name: upload service
+      copy:
+        src: /vagrant/provisioning/conf/systemd-journal-upload.service
+        dest: /etc/systemd/system
+    - name: upload service conf
+      copy:
+        src: /vagrant/provisioning/conf/journal-upload.conf
+        dest: /etc/systemd/   
+    - name: copy audit.rules
+      copy:
+        src: /vagrant/provisioning/conf/audit.rules
+        dest: /etc/audit/ 
+    - name: enable clientevents.service
+      systemd: 
+        name: clientevents.service
+        state: started
+        enabled: true
+        daemon_reload: yes
+    - name: nginx_conf_audit.service
+      systemd: 
+        name: nginx_conf_audit.service
+        state: started
+        enabled: true
+        daemon_reload: yes    
+    - name: systemd-journal-upload.service
+      systemd: 
+        name: systemd-journal-upload.service
+        state: started
+        enabled: true
+        daemon_reload: yes    

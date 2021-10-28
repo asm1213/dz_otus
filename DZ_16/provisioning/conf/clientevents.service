@@ -1,0 +1,13 @@
+[Unit]
+Description=Custom  Remote Upload Service
+After=network.target
+
+[Service]
+ExecStart=/bin/sh -c '/usr/bin/journalctl -o export -f | /usr/lib/systemd/systemd-journal-remote -o /var/log/journal/remote/webcrit.journal -'
+
+
+#Restart=always
+#RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

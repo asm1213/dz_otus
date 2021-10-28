@@ -1,0 +1,13 @@
+[Unit]
+Description=Custom  Remote Upload Service
+After=network.target
+
+[Service]
+ExecStart=/bin/sh -c 'tail -f /var/log/audit/audit.log  | systemd-cat -t nginx_conf_audit'
+
+
+#Restart=always
+#RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
