@@ -1,6 +1,0 @@
-.idea/*
-.vagrant/*
-config/sample.sql
-data/*
-!data/master/.gitkeep
-!data/slave/.gitkeep
