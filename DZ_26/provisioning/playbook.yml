@@ -1,0 +1,12 @@
+---
+- name: install postgres
+  hosts: nodes
+  become: true
+  tasks:
+    - name: add pssql repo
+      package:
+        name:
+        - vim
+      state: latest
+
+    
