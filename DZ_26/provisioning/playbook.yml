@@ -1,12 +1,14 @@
 ---
 - name: install postgres
-  hosts: nodes
+  hosts: master
   become: true
   tasks:
     - name: add pssql repo
-      package:
+      shell: "sudo yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    - name: install pssql
+      yum:
         name:
-        - vim
-      state: latest
+          - postgresql14-server
+        state: latest
 
     
