@@ -20,7 +20,7 @@
   when: not postgres_data.stat.exists
 - name: copy pssql confs files
   copy:
-    src: /vagrant/provisionin/{{ item }}
+    src: files/{{ item }}
     dest: /var/lib/pgsql/14/data
     owner: postgres
     group: postgres
