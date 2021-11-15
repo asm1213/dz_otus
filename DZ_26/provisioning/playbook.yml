@@ -1,14 +1,5 @@
 ---
-- name: install postgres
+- name: master
   hosts: master
-  become: true
-  tasks:
-    - name: add pssql repo
-      yum:
-        name: http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-        state: present
-        validate_certs: yes
-    - name: install pssql
-      yum:
-        name: postgresql14-server
-        state: latest
+  roles:
+    - master
