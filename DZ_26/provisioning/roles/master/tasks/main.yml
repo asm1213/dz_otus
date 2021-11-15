@@ -1,28 +1,56 @@
 ---
 # tasks file for master
-- name: install postgres
-  become: true
-  tasks:
-    - name: add pssql repo #for centos7 psql-14
-      yum:
-        name: http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-        state: present
-        validate_certs: yes
-    - name: install pssql # install server
-      yum:
-        name: postgresql14-server
-        state: latest
-    - name: "Find out if PostgreSQL is initialized"
-      ansible.builtin.stat:
-        path: "/var/lib/pgsql/data/pg_hba.conf"
-      register: postgres_data
-
-    - name: "Initialize PostgreSQL"
-      shell: "postgresql-setup initdb"
-      when: not postgres_data.stat.exists
- 
-    - name: "Start and enable services"
-      systemd:
-        name: postgres
-        state: started
-        enabled: yes
+- name: add pssql repo #for centos7 psql-14
+  yum:
+    name: http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+    validate_certs: yes
+- name: install pssql # install server
+  yum:
+    name: postgresql14-server
+    state: latest
+- name: "Find out if PostgreSQL is initialized"
+  ansible.builtin.stat:
+    path: "/var/lib/pgsql/14/data/pg_hba.conf"
+  register: postgres_data
+- name: "Initialize PostgreSQL"
+  become: yes
+  become_user: postgres
+  shell: "/usr/pgsql-14/bin/pg_ctl initdb -D /var/lib/pgsql/14/data"
+  when: not postgres_data.stat.exists
+- name: copy pssql confs files
+  copy:
+    src: /vagrant/provisionin/{{ item }}
+    dest: /var/lib/pgsql/14/data
+    owner: postgres
+    group: postgres
+    with_items:
+      - pg_hba.conf
+      - postgresql.conf
+- name: "Start and enable services"
+  systemd:
+    name: postgresql-14.service
+    state: started
+    enabled: yes
+- name: "Create app database"
+  postgresql_db:
+    state: present
+    name: "{{ db_name }}"
+  become: yes
+  become_user: postgres
+- name: "Create db user"
+  postgresql_user:
+    state: present
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+  become: yes
+  become_user: postgres
+- name: "Grant db user access to app db"
+  postgresql_privs:
+    type: database
+    database: "{{ db_name }}"
+    roles: "{{ db_user }}"
+    grant_option: no
+    privs: all
+  become: yes
+  become_user: postgres

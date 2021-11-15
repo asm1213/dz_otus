@@ -2,4 +2,4 @@
 # vars file for master
 db_user: appuser
 db_password: appuser
-db_name: test
+db_name: testotus
