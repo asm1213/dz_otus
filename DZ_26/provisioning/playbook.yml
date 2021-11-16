@@ -4,3 +4,8 @@
   become: true
   roles:
     - master
+- name: slave
+  hosts: slave
+  become: true
+  roles:
+    - slave

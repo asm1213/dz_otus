@@ -1,0 +1,38 @@
+---
+# tasks file for master
+- name: add pssql repo #for centos7 psql-14
+  yum:
+    name: http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+    validate_certs: yes
+- name: install packets
+  yum:
+    name: 
+      - postgresql14-server
+    state: latest
+- name: "Find out if PostgreSQL is initialized"
+  ansible.builtin.stat:
+    path: "/var/lib/pgsql/14/data/pg_hba.conf"
+  register: postgres_data
+- name: "Initialize PostgreSQL"
+  become: yes
+  become_user: postgres
+  shell: "/usr/pgsql-14/bin/pg_ctl initdb -D /var/lib/pgsql/14/data"
+  when: not postgres_data.stat.exists
+- name: copy pssql confs files
+  copy:
+    src: '{{item}}'
+    dest: '/var/lib/pgsql/14/data/'
+    owner: postgres
+    group: postgres
+  loop:
+    - recovery.conf
+# - name: "Start and enable services"
+#   systemd:
+#     name: postgresql-14.service
+#     state: started
+#     enabled: yes
+- name: repl base
+  become_user: postgres
+  command: "pg_basebackup -X stream -h master -D /var/lib/pgsql/14/data/ -P -U appuser"
+  notify: restart postgres

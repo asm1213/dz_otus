@@ -5,9 +5,11 @@
     name: http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     state: present
     validate_certs: yes
-- name: install pssql # install server
+- name: install packets
   yum:
-    name: postgresql14-server
+    name: 
+      - postgresql14-server
+      - python-psycopg2
     state: latest
 - name: "Find out if PostgreSQL is initialized"
   ansible.builtin.stat:
@@ -20,13 +22,15 @@
   when: not postgres_data.stat.exists
 - name: copy pssql confs files
   copy:
-    src: files/{{ item }}
-    dest: /var/lib/pgsql/14/data
+    src: '{{item}}'
+    dest: '/var/lib/pgsql/14/data/'
     owner: postgres
     group: postgres
-    with_items:
-      - pg_hba.conf
-      - postgresql.conf
+  loop:
+    - pg_hba.conf
+    - postgresql.conf
+  notify:
+    - restart postgres
 - name: "Start and enable services"
   systemd:
     name: postgresql-14.service
@@ -41,8 +45,10 @@
 - name: "Create db user"
   postgresql_user:
     state: present
+   # db: "{{ db_name }}"
     name: "{{ db_user }}"
     password: "{{ db_password }}"
+   # priv: "ALL/products:ALL"
   become: yes
   become_user: postgres
 - name: "Grant db user access to app db"
@@ -54,3 +60,8 @@
     privs: all
   become: yes
   become_user: postgres
+- name: Create physical_one physical slot if doesn't exist
+  become_user: postgres
+  postgresql_slot:
+    slot_name: physical_one
+    db: testotus
