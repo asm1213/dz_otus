@@ -23,23 +23,32 @@
   shell: "/usr/pgsql-14/bin/pg_ctl initdb -D /var/lib/pgsql/14/data"
   when: not postgres_data.stat.exists
 
-- name: copy pssql confs files
-  copy:
-    src: '{{item}}'
-    dest: '/var/lib/pgsql/14/data/'
+- name: rm data
+  file:
+    path: /var/lib/pgsql/14/data
+    state: absent
+
+- name: mk data
+  file:
+    path: /var/lib/pgsql/14/data
+    state: directory
     owner: postgres
     group: postgres
-  loop:
-    - recovery.conf
-
-- name: destroy psql postggres data
-  shell: "rm -rf /var/lib/pgsql/14/data/*"
-
+    mode: '0750'
+    
 - name: repl base
   become_user: postgres
-  command: "pg_basebackup -X stream -h master -D /var/lib/pgsql/14/data/ -P -U repuser"
+  command: "pg_basebackup -h master -U repuser -p 5432 -D /var/lib/pgsql/14/data/ -Fp -Xs -P -R" #"pg_basebackup -X stream -h master -D /var/lib/pgsql/14/data/ -P -U repuser"
   notify: restart postgres
 
+# - name: copy pssql confs files
+#   copy:
+#     src: '{{item}}'
+#     dest: '/var/lib/pgsql/14/data/'
+#     owner: postgres
+#     group: postgres
+#   loop:
+#     - postgresql.conf
 
 - name: "Start and enable services"
   systemd:
