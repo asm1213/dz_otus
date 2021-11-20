@@ -1,12 +1,39 @@
 ---
 # tasks file for master
+- name: add reps
+  yum:
+    name: 
+      - http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+      - epel-*
+    state: latest
+
 - name: install package
   yum:
     name:
+      - postgresql14-server
+      - python-psycopg2
       - barman
       - barman-cli
     state: latest
+  
+- name: copy pgpass  
+  copy:  
+    src: .pgpass
+    dest: /var/lib/barman/.pgpass
+    mode: '0600'
+    owner: barman
+    group: barman
 
-# -name: copy barman conf
-#   file:
-#     path:
+- name: copy barman conf
+  copy:
+    src: barman.conf
+    dest: /etc/barman.conf
+    owner: barman
+    group: barman
+
+- name: copy master pgsql srv conf
+  copy: 
+    src: master.conf
+    dest: /etc/barman.d/master.conf
+    owner: barman
+    group: barman
