@@ -1,16 +1,18 @@
 ---
 # tasks file for master
-- name: add pssql repo #for centos7 psql-14
+- name: add reps
   yum:
-    name: http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-    state: present
-    validate_certs: yes
+    name: 
+      - http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+      - epel-*
+    state: latest
 
 - name: install packets
   yum:
     name: 
       - postgresql14-server
       - python-psycopg2
+      - barman-cli
     state: latest
 
 - name: "Find out if PostgreSQL is initialized"
@@ -51,9 +53,17 @@
 
 - name: Create Repl role
   postgresql_user:
-    name: repuser
-    password: '1234'
+    name: "{{ stream_user }}"
+    password: "{{ stream_password }}"
     role_attr_flags: REPLICATION
+  become: yes
+  become_user: postgres
+
+- name: Create barman user
+  postgresql_user:
+    name: "{{ barman_stream_user }}"
+    password: "{{ barman_stream_password }}"
+    role_attr_flags: SUPERUSER
   become: yes
   become_user: postgres
 

@@ -9,3 +9,8 @@
   become: true
   roles:
     - slave
+- name: barman
+  hosts: ansiblecontroller
+  become: true
+  roles:
+    - barman

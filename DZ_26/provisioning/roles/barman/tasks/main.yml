@@ -1,0 +1,12 @@
+---
+# tasks file for master
+- name: install package
+  yum:
+    name:
+      - barman
+      - barman-cli
+    state: latest
+
+# -name: copy barman conf
+#   file:
+#     path:

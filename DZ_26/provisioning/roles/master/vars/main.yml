@@ -3,3 +3,7 @@
 db_user: appuser
 db_password: appuser
 db_name: testotus
+stream_user: repuser
+stream_password: 1234
+barman_stream_user: barman
+barman_stream_password: 1234
