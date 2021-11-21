@@ -51,6 +51,11 @@ postgres(#     Email CHARACTER VARYING(30),
 postgres(#     Age INTEGER
 postgres(# );
 ```
+добавил в нее пару записей
+```
+postgres=# INSERT INTO customers VALUES (1, 'serg','art','1@1.com', 15);
+postgres=# INSERT INTO customers VALUES (1, 'srg','at','21@1.com', 125);
+```
 проверим на slave
 ```
 postgres=# \dt
@@ -59,4 +64,60 @@ postgres=# \dt
 --------+-----------+-------+----------
  public | customers | table | postgres
 (1 row)
+```
+
+** **
+## BARMAN
+Настраивал стрим репликацию.
+пользователь barman superuser в постгрес.
+Рекомендация из мануала. 
+Для работы репликации в $PATH barman и postgres добален /usr/pgsql-14/bin/
+иначе не запускается pg_receivewal
+
+Чтобы не ждать смены wal файла и проверить настройки сделаем это принудительно
+``` 
+barman switch-xlog --force --archive master 
+```
+
+сделаем бэкап
+```
+bash-4.2$ barman backup master
+Starting backup using postgres method for server master in /var/lib/barman/master/base/20211121T135647
+Backup start at LSN: 0/A000060 (00000001000000000000000A, 00000060)
+Starting backup copy via pg_basebackup for 20211121T135647
+Copy done (time: 5 seconds)
+Finalising the backup.
+This is the first backup for server master
+WAL segments preceding the current backup have been found:
+        000000010000000000000009 from server master has been removed
+Backup size: 33.3 MiB
+Backup end at LSN: 0/C000000 (00000001000000000000000B, 00000000)
+Backup completed (start time: 2021-11-21 13:56:47.930269, elapsed time: 7 seconds)
+Processing xlog segments from streaming for master
+        00000001000000000000000A
+        00000001000000000000000B
+```
+проверим сервер
+```
+bash-4.2$ barman check master
+Server master:
+        PostgreSQL: OK
+        superuser or standard user with backup privileges: OK
+        PostgreSQL streaming: OK
+        wal_level: OK
+        replication slot: OK
+        directories: OK
+        retention policy settings: OK
+        backup maximum age: OK (no last_backup_maximum_age provided)
+        compression settings: OK
+        failed backups: OK (there are 0 failed backups)
+        minimum redundancy requirements: OK (have 1 backups, expected at least 1)
+        pg_basebackup: OK
+        pg_basebackup compatible: OK
+        pg_basebackup supports tablespaces mapping: OK
+        systemid coherence: OK
+        pg_receivexlog: OK
+        pg_receivexlog compatible: OK
+        receive-wal running: OK
+        archiver errors: OK
 ```
