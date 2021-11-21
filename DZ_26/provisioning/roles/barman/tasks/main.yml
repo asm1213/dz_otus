@@ -10,8 +10,7 @@
 - name: install package
   yum:
     name:
-      - postgresql14-server
-      - python-psycopg2
+      - postgresql14
       - barman
       - barman-cli
     state: latest
@@ -19,7 +18,7 @@
 - name: copy pgpass  
   copy:  
     src: .pgpass
-    dest: /var/lib/barman/.pgpass
+    dest: /var/lib/barman/
     mode: '0600'
     owner: barman
     group: barman
@@ -27,13 +26,28 @@
 - name: copy barman conf
   copy:
     src: barman.conf
-    dest: /etc/barman.conf
+    dest: /etc/
     owner: barman
     group: barman
 
 - name: copy master pgsql srv conf
   copy: 
     src: master.conf
-    dest: /etc/barman.d/master.conf
+    dest: /etc/barman.d/
     owner: barman
     group: barman
+
+- name: "Add pgsql bin dir to system-wide $PATH"
+  copy:
+    dest: /etc/profile.d/custom-path.sh
+    content: 'PATH=$PATH:/usr/pgsql-14/bin/'
+
+# - name: Add to path user barman
+#   shell: "export PATH=/usr/pgsql-14/bin/:$PATH"
+#   become: yes
+#   become_user: barman
+
+- name: Start barman archiver
+  shell: barman cron
+  become: yes
+  become_user: barman

@@ -88,5 +88,21 @@
 - name: Create physical_one physical slot if doesn't exist
   become_user: postgres
   postgresql_slot:
-    slot_name: physical_one
+    slot_name: slave
     db: testotus
+
+- name: Create barman physical slot if doesn't exist
+  become_user: postgres
+  postgresql_slot:
+    slot_name: barman
+    db: testotus
+
+- name: "Add pgsql bin dir to system-wide $PATH"
+  copy:
+    dest: /etc/profile.d/custom-path.sh
+    content: 'PATH=$PATH:/usr/pgsql-14/bin/'
+
+# - name: Add to path user postgres
+#   shell: "export PATH=/usr/pgsql-14/bin/:$PATH"
+#   become: yes
+#   become_user: postgres
