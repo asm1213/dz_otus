@@ -1,17 +1,39 @@
 ---
 - name: install vim
   hosts: nodes
+  become: true
   tasks:
     - name: vim
       package:
         name:
           - vim
         state: latest
-- name: borgbackup
+
+- name: borgbackup server 
   hosts: backupserver
   become: true
+  vars:
+    mount_src: /dev/sdb
+    mount_path: /var/backup
+  pre_tasks:
+    - name: Create list of mounted devices
+      set_fact:
+        mounted_devices: "{{ ansible_mounts|json_query('[].device') }}"
+    - name: Create File System
+      filesystem:
+        fstype: ext4
+        dev: "{{ mount_src }}"
+      when: mount_src not in mounted_devices
+    - name: Mount File System
+      mount:
+        path: "{{ mount_path }}"
+        src: "{{ mount_src }}"
+        fstype: ext4
+        state: mounted
+      when: mount_src not in mounted_devices
   roles:
     - borgbackup
+    
 - name: client
   hosts: client
   become: true
