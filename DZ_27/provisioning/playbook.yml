@@ -1,0 +1,11 @@
+---
+- name: borgbackup
+  hosts: backupserver
+  become: true
+  roles:
+    - borgbackup
+- name: client
+  hosts: client
+  become: true
+  roles:
+    - client
