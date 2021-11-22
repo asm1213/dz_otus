@@ -1,0 +1,19 @@
+---
+- name: install vim
+  hosts: nodes
+  tasks:
+    - name: vim
+      package:
+        name:
+          - vim
+        state: latest
+- name: borgbackup
+  hosts: backupserver
+  become: true
+  roles:
+    - borgbackup
+- name: client
+  hosts: client
+  become: true
+  roles:
+    - client

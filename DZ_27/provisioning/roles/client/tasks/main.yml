@@ -1,0 +1,11 @@
+---
+- name: install epel
+  yum:
+    name:
+      - epel-*
+    state: latest
+- name: Install
+  package: 
+    name:
+      - borgbackup
+    state: latest
