@@ -1,5 +1,4 @@
 ---
-<<<<<<< HEAD
 - name: install vim
   hosts: nodes
   tasks:
@@ -8,8 +7,6 @@
         name:
           - vim
         state: latest
-=======
->>>>>>> f06153052514b237a6de8a9687b385c26b9e8dfb
 - name: borgbackup
   hosts: backupserver
   become: true
