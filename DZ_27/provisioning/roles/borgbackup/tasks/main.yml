@@ -9,12 +9,7 @@
     name:
       - borgbackup
     state: latest
-- name: create borg folder
-  file:
-    path: /var/backup/borg
-    state: directory
-    owner: borg
-    group: borg
+
 - name: create user borg
   user:
     name: borg
@@ -27,6 +22,12 @@
 # - name: create repo folder
 #   file:
 #     path
+- name: create borg folder
+  file:
+    path: /var/backup/borg
+    state: directory
+    owner: borg
+    group: borg
 - name: init borg repo
   shell: 'borg init -e none /var/backup/borg'     
   become: yes
