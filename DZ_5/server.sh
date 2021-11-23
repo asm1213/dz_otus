@@ -1,5 +1,5 @@
 #!/bin/bash
-vagyum update -y
+yum update -y
 yum install nfs-utils -y
 mkdir /var/share
 chmod -R 777 /var/share

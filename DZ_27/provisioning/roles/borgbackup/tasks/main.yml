@@ -17,7 +17,7 @@
     create_home: yes
     force: yes
     home: /home/borg
-    generate_ssh_key: yes
+    #generate_ssh_key: yes
     #ssh_key_file: /home/borg/.ssh/id_rsa #private key
 # - name: create repo folder
 #   file:
@@ -32,3 +32,24 @@
   shell: 'borg init -e none /var/backup/borg'     
   become: yes
   become_user: borg
+
+- name: make folder fo share
+  file:
+    path: /var/share
+    state: directory
+    mode: '777'
+
+- name: "nfsd: Configure exports"
+  copy:
+    src: exports
+    dest: "/etc/exports"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: reload nfsd
+
+- name: ensure nfs server started
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: yes
