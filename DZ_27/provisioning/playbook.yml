@@ -34,8 +34,8 @@
   roles:
     - borgbackup
     
-- name: client
-  hosts: client
-  become: true
-  roles:
-    - client
+# - name: client
+#   hosts: client
+#   become: true
+#   roles:
+#     - client

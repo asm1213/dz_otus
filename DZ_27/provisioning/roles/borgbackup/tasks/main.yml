@@ -9,3 +9,25 @@
     name:
       - borgbackup
     state: latest
+- name: create borg folder
+  file:
+    path: /var/backup/borg
+    state: directory
+    owner: borg
+    group: borg
+- name: create user borg
+  user:
+    name: borg
+    comment: borg backup user
+    create_home: yes
+    force: yes
+    home: /home/borg
+    generate_ssh_key: yes
+    #ssh_key_file: /home/borg/.ssh/id_rsa #private key
+# - name: create repo folder
+#   file:
+#     path
+- name: init borg repo
+  shell: 'borg init -e none /var/backup/borg'     
+  become: yes
+  become_user: borg
