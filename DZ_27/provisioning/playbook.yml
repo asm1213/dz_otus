@@ -41,11 +41,22 @@
     - client
 
 - name: add ssh key to server
-  hosts: backupclient
+  hosts: backupserver
   tasks:
+    - name: "Find out if borg ssh key  already exist"
+      become: yes
+      become_user: borg
+      stat:
+        path: "~borg/.ssh/authorized_keys"
+      register: borgssh_data
     - name: ddd
       become: yes
       become_user: borg
-      shell: 'echo command="/usr/bin/borg serve" $(cat /var/share/id_rsa.pub) >> ~borg/.ssh/authorized_keys'
-  
-
+      shell: 'echo command=\"/usr/bin/borg serve\" $(cat /var/share/id_rsa.pub) >> ~borg/.ssh/authorized_keys'
+      when: not borgssh_data.stat.exists
+    # - name: ensure   authorized_keys mode
+    #   file:
+    #     path: /~borg/.ssh/authorized_keys
+    #     owner: borg
+    #     group: borg
+    #     mode: '600'

@@ -17,6 +17,13 @@
     create_home: yes
     force: yes
     home: /home/borg
+- name: create ssh directory
+  file:
+    path: ~borg/.ssh
+    state: directory
+    mode: '700'
+    owner: borg
+    group: borg
     #generate_ssh_key: yes
     #ssh_key_file: /home/borg/.ssh/id_rsa #private key
 # - name: create repo folder
@@ -28,10 +35,17 @@
     state: directory
     owner: borg
     group: borg
+
+- name: "Find out if borg repo is initialized"
+  ansible.builtin.stat:
+    path: "/var/backup/borg/index.1"
+  register: borg_data 
+
 - name: init borg repo
   shell: 'borg init -e none /var/backup/borg'     
   become: yes
   become_user: borg
+  when: not borg_data.stat.exists
 
 - name: make folder fo share
   file:
