@@ -39,3 +39,13 @@
   become: true
   roles:
     - client
+
+- name: add ssh key to server
+  hosts: backupclient
+  tasks:
+    - name: ddd
+      become: yes
+      become_user: borg
+      shell: 'echo command="/usr/bin/borg serve" $(cat /var/share/id_rsa.pub) >> ~borg/.ssh/authorized_keys'
+  
+

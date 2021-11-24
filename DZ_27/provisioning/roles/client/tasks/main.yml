@@ -21,5 +21,6 @@
     generate_ssh_key: yes
 - name: copy key 
   copy: 
-    src: /home/vagrant/.ssh/ird_rsa.pub
+    src: /home/vagrant/.ssh/id_rsa.pub
     dest: /mnt
+    remote_src: yes
