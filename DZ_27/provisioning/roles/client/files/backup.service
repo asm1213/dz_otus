@@ -1,0 +1,7 @@
+[Unit]
+Description= "BORG BACK UP SERVICE"
+[Service]
+User=vagrant
+Group=vagrant
+Type=oneshot
+ExecStart=/bin/sh -c '/usr/bin/borg create --stats --list borg@backupserver:/var/backup/borg::"MyFirstBackup-{now:%Y-%m-%d_%H:%M:%S}" /etc 2>&1 | /usr/bin/systemd-cat -t BORGBACKUP'

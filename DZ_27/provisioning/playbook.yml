@@ -54,9 +54,12 @@
       become_user: borg
       shell: 'echo command=\"/usr/bin/borg serve\" $(cat /var/share/id_rsa.pub) >> ~borg/.ssh/authorized_keys'
       when: not borgssh_data.stat.exists
-    # - name: ensure   authorized_keys mode
-    #   file:
-    #     path: /~borg/.ssh/authorized_keys
-    #     owner: borg
-    #     group: borg
-    #     mode: '600'
+    - name: "Enable backup every 1 min"
+      systemd:
+        name: '{{item}}'
+        state: started
+        enabled: yes
+        daemon-reload: yes
+      loop:
+        - borgprune.timer
+        - borgprune.service

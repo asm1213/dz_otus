@@ -1,0 +1,7 @@
+[Unit]
+Description=Run srservice every 20 second
+[Timer]
+OnUnitActiveSec=20
+Unit=backup.service
+[Install]
+WantedBy=multi-user.target

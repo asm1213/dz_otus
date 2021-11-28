@@ -38,7 +38,7 @@
 
 - name: "Find out if borg repo is initialized"
   ansible.builtin.stat:
-    path: "/var/backup/borg/index.1"
+    path: "/var/backup/borg/README"
   register: borg_data 
 
 - name: init borg repo
@@ -67,3 +67,21 @@
     name: nfs-server
     state: started
     enabled: yes
+
+- name: "Copy backup.service"
+  copy:
+    src: '{{item}}'
+    dest: /etc/systemd/system
+  loop:
+    - borgprune.service
+    - borgprune.timer
+
+- name: "Enable backup every 1 min"
+  systemd:
+    name: '{{item}}'
+    state: started
+    enabled: yes
+    daemon-reload: yes
+  loop:
+    - borgprune.timer
+    - borgprune.service

@@ -24,3 +24,25 @@
     src: /home/vagrant/.ssh/id_rsa.pub
     dest: /mnt
     remote_src: yes
+# - name: create job for backup
+#   cron:
+#     name: "BACKUP"
+#     minute: "1"
+#     user: vagrant
+#     job: "/bin/sh -c '/usr/bin/borg create --stats --list borg@backupserver:/var/backup/borg::\"MyFirstBackup-{now:%Y-%m-%d_%H:%M:%S}\" /etc 2>&1 | /usr/bin/systemd-cat -t BORGBACKUP'" 
+- name: "Copy backup.service"
+  copy:
+    src: '{{item}}'
+    dest: /etc/systemd/system
+  loop:
+    - backup.service
+    - backup.timer
+- name: "Enable backup every 1 min"
+  systemd:
+    name: 'backup.{{item}}'
+    state: started
+    enabled: yes
+    daemon-reload: yes
+  loop:
+    - timer
+    - service
