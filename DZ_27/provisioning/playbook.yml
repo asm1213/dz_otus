@@ -16,14 +16,17 @@
     mount_src: /dev/sdb
     mount_path: /var/backup
   pre_tasks:
+
     - name: Create list of mounted devices
       set_fact:
         mounted_devices: "{{ ansible_mounts|json_query('[].device') }}"
+
     - name: Create File System
       filesystem:
         fstype: ext4
         dev: "{{ mount_src }}"
       when: mount_src not in mounted_devices
+
     - name: Mount File System
       mount:
         path: "{{ mount_path }}"
@@ -31,6 +34,7 @@
         fstype: ext4
         state: mounted
       when: mount_src not in mounted_devices
+      
   roles:
     - borgbackup
     
@@ -49,17 +53,18 @@
       stat:
         path: "~borg/.ssh/authorized_keys"
       register: borgssh_data
+
     - name: ddd
       become: yes
       become_user: borg
       shell: 'echo command=\"/usr/bin/borg serve\" $(cat /var/share/id_rsa.pub) >> ~borg/.ssh/authorized_keys'
       when: not borgssh_data.stat.exists
-    - name: "Enable backup every 1 min"
-      systemd:
-        name: '{{item}}'
-        state: started
-        enabled: yes
-        daemon-reload: yes
-      loop:
-        - borgprune.timer
-        - borgprune.service
+    # - name: "Enable backup every 1 min"
+    #   systemd:
+    #     name: '{{item}}'
+    #     state: started
+    #     enabled: yes
+    #     daemon-reload: yes
+    #   loop:
+    #     - borgprune.timer
+    #     - borgprune.service

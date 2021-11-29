@@ -1,22 +1,24 @@
 ---
-- name: install epel
+- name: "install epel"
   yum:
     name:
       - epel-*
     state: latest
-- name: Install
+
+- name: "Install borg"
   package: 
     name:
       - borgbackup
     state: latest
 
-- name: create user borg
+- name: "create user borg"
   user:
     name: borg
     comment: borg backup user
     create_home: yes
     force: yes
-    home: /home/borg
+    #home: /var/backup/repos
+
 - name: create ssh directory
   file:
     path: ~borg/.ssh
@@ -24,25 +26,21 @@
     mode: '700'
     owner: borg
     group: borg
-    #generate_ssh_key: yes
-    #ssh_key_file: /home/borg/.ssh/id_rsa #private key
-# - name: create repo folder
-#   file:
-#     path
+
 - name: create borg folder
   file:
-    path: /var/backup/borg
+    path: /var/backup/repo
     state: directory
     owner: borg
     group: borg
 
 - name: "Find out if borg repo is initialized"
   ansible.builtin.stat:
-    path: "/var/backup/borg/README"
+    path: "/var/backup/repo/client/README"
   register: borg_data 
 
 - name: init borg repo
-  shell: 'borg init -e none /var/backup/borg'     
+  shell: 'borg init -e authenticated /var/backup/repo/client'     
   become: yes
   become_user: borg
   when: not borg_data.stat.exists
@@ -68,20 +66,20 @@
     state: started
     enabled: yes
 
-- name: "Copy backup.service"
-  copy:
-    src: '{{item}}'
-    dest: /etc/systemd/system
-  loop:
-    - borgprune.service
-    - borgprune.timer
+# - name: "Copy backup.service"
+#   copy:
+#     src: '{{item}}'
+#     dest: /etc/systemd/system
+#   loop:
+#     - borgprune.service
+#     - borgprune.timer
 
-- name: "Enable backup every 1 min"
-  systemd:
-    name: '{{item}}'
-    state: started
-    enabled: yes
-    daemon-reload: yes
-  loop:
-    - borgprune.timer
-    - borgprune.service
+# - name: "Enable backup every 1 min"
+#   systemd:
+#     name: '{{item}}'
+#     state: started
+#     enabled: yes
+#     daemon-reload: yes
+#   loop:
+#     - borgprune.timer
+#     - borgprune.service
