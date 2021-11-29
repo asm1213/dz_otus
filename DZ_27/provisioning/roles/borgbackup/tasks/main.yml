@@ -17,7 +17,6 @@
     comment: borg backup user
     create_home: yes
     force: yes
-    #home: /var/backup/repos
 
 - name: create ssh directory
   file:
@@ -33,17 +32,6 @@
     state: directory
     owner: borg
     group: borg
-
-- name: "Find out if borg repo is initialized"
-  ansible.builtin.stat:
-    path: "/var/backup/repo/client/README"
-  register: borg_data 
-
-- name: init borg repo
-  shell: 'borg init -e authenticated /var/backup/repo/client'     
-  become: yes
-  become_user: borg
-  when: not borg_data.stat.exists
 
 - name: make folder fo share
   file:
@@ -66,20 +54,15 @@
     state: started
     enabled: yes
 
-# - name: "Copy backup.service"
-#   copy:
-#     src: '{{item}}'
-#     dest: /etc/systemd/system
-#   loop:
-#     - borgprune.service
-#     - borgprune.timer
+- name: "Find out if borg repo is initialized"
+  ansible.builtin.stat:
+    path: "/var/backup/repo/client/README"
+  register: borg_data 
 
-# - name: "Enable backup every 1 min"
-#   systemd:
-#     name: '{{item}}'
-#     state: started
-#     enabled: yes
-#     daemon-reload: yes
-#   loop:
-#     - borgprune.timer
-#     - borgprune.service
+- name: init borg repo
+  shell: |
+    export BORG_PASSPHRASE='1234'
+    borg init --encryption=repokey-blake2 /var/backup/repo/client     
+  become: yes
+  become_user: borg
+  when: not borg_data.stat.exists

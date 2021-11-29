@@ -1,8 +1,0 @@
-[Unit]
-Description=Run srservice every 20 second
-[Timer]
-OnCalendar=daily
-AccuracySec=12h
-Persistent=true
-[Install]
-WantedBy=multi-user.target

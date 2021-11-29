@@ -1,7 +1,0 @@
-[Unit]
-Description= "BORG BACK UP SERVICE"
-[Service]
-User=borg
-Group=borg
-Type=oneshot
-ExecStart=/bin/sh -c '/usr/bin/borg prune --keep-within 3m -y 1 -m 1 /var/backup/borg'
