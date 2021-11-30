@@ -20,16 +20,19 @@
 
 - name: gen ssh key
   user:
-    name: vagrant
+    name: root
     generate_ssh_key: yes
 
 - name: copy key 
   copy: 
-    src: /home/vagrant/.ssh/id_rsa.pub
+    src: /root/.ssh/id_rsa.pub
     dest: /mnt
     remote_src: yes
-    
 
+- name: "copy ssh conf"
+  copy:
+    src: sshconfig
+    dest: /root/.ssh/config
 
 - name: "Copy backup.service"
   copy:
@@ -39,12 +42,12 @@
     - backup.service
     - backup.timer
 
-# - name: "Enable backup every 1 min"
-#   systemd:
-#     name: 'backup.{{item}}'
-#     state: started
-#     enabled: yes
-#     daemon-reload: yes
-#   loop:
-#     - timer
-#     - service
+- name: "Enable backup every 1 min"
+  systemd:
+    name: 'backup.{{item}}'
+    state: started
+    enabled: yes
+    daemon-reload: yes
+  loop:
+    - timer
+    - service

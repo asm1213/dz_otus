@@ -1,0 +1,3 @@
+Host backupserver
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null

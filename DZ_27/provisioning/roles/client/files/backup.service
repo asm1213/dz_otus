@@ -1,7 +1,7 @@
 [Unit]
 Description= "BORG BACK UP SERVICE"
 [Service]
-#User=vagrant
-#Group=vagrant
+User=root
+Group=root
 Type=oneshot
-ExecStart=/bin/sh -c '/root/borg.sh | /usr/bin/logger -t BORGBACKUP'
+ExecStart=/usr/bin/sh -c '/vagrant/provisioning/roles/client/files/borg.sh 2>&1 | /usr/bin/logger -t BORG'

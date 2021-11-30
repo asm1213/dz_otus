@@ -33,18 +33,7 @@ backup_exit=$?
 
 info "Pruning repository"
 
-# Use the `prune` subcommand to maintain 7 daily, 4 weekly and 6 monthly
-# archives of THIS machine. The '{hostname}-' prefix is very important to
-# limit prune's operation to this machine's archives and not apply to
-# other machines' archives also:
---keep-within 3m -y 1 -m 1
-borg prune                          \
-    --list                          \
-    --prefix '{hostname}-'          \
-    --show-rc                       \
-    --keep-within 3m                \
-    --keep-yearly 1                 \   
-    --keep-monthly  1               \
+borg prune --list --show-rc --keep-within 3m --keep-yearly 1 --keep-monthly  1
 
 prune_exit=$?
 
