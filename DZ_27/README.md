@@ -19,3 +19,45 @@
 Формат сдачи ДЗ - vagrant + ansible
 ```
 ** **
+в вагранте создается отдельнвый vdi который монтируется для бэкапа.
+SSH ключи автоматически отправляются на сервер через nfs шару.
+для автоматизации использовал юнит и  таймер sustemd.
+вывод в journald через logger.
+
+получим список бэкапов
+```
+[vagrant@client ~]$ sudo borg list borg@backupserver:/var/backup/repo/client
+Remote: Warning: Permanently added 'backupserver,192.168.10.10' (ECDSA) to the list of known hosts.
+Enter passphrase for key ssh://borg@backupserver/var/backup/repo/client: 
+client-2021-12-01T18:23:36           Wed, 2021-12-01 18:23:39 [7073967a1d15bcedef41e2642571d41653e75d78a74050aa7b5264bddcd8dabb]
+client-2021-12-01T18:24:36           Wed, 2021-12-01 18:24:38 [5125f8d8fb7b3928ca50b3d18eb63f2057387755f04da1e475529451e39c6d1a]
+client-2021-12-01T18:25:36           Wed, 2021-12-01 18:25:38 [dfaf91f99f3436d4325a40adb5f6126463ee2a38555caaf2bc81ae3fd43a97de]
+client-2021-12-01T18:26:37           Wed, 2021-12-01 18:26:40 [fe922ab827e864ead062c856f6bbd72a993f74464d63d4b28982cb246f96d660]
+client-2021-12-01T18:27:36           Wed, 2021-12-01 18:27:38 [593ccb0ecef38a543bc43e52e95a2fe17d01bcfc421df10bfe059ee9ff1190a1]
+client-2021-12-01T18:28:36           Wed, 2021-12-01 18:28:41 [8c857ef8cd697d6caea3e0be8ccf4caa2a5b9a4eb9c93c3bb8a67591230e8ac8]
+client-2021-12-01T18:29:36           Wed, 2021-12-01 18:29:38 [d1829d21022ef53a376cdd2ff13d655188a418f046948ab131995ed34007c1b2]
+client-2021-12-01T18:30:36           Wed, 2021-12-01 18:30:39 [e53056800baccfd91da57d18a9c287a97b50703d62173de69acbee4237b1c554]
+client-2021-12-01T18:31:36           Wed, 2021-12-01 18:31:38 [52e9a994ec2c4d321350a1aa0dc2f50528f1c6b452be552fc06be236edfd32ca]
+client-2021-12-01T18:32:36           Wed, 2021-12-01 18:32:38 [bb1f5db2a705efd44a0f1b163bce0a96175b8ba5dfa92205818c66204b8ddcbb]
+client-2021-12-01T18:33:36           Wed, 2021-12-01 18:33:38 [78b9fb6dba4c597a1a8ce5a6b4ecd70ae49d108b0936022b101d71492b57f0be]
+client-2021-12-01T18:34:36           Wed, 2021-12-01 18:34:39 [56d3483d1dc07356e564429465400bcde2945fbf09fa450a78ec2e0107a29615]
+client-2021-12-01T18:35:19           Wed, 2021-12-01 18:35:22 [1c225f7bcddb7d2866e7497127d0cf8acb755e45a17d9b318fb04dc20ebb83fa]
+client-2021-12-01T18:35:41           Wed, 2021-12-01 18:35:43 [408af7557067e5b2de4a7daf2dae984bffdb82e94ef699489df9e614ffe3d446]
+```
+удаkbv директорию
+```
+rm -rf /etc/yum
+```
+извлечем удаленыый контент из поледнего бэкапап, посмотрим его содержимое
+```
+sudo borg list borg@backupserver:/var/backup/repo/client::client-2021-12-01T18:35:41
+```
+извлекаем
+```
+sudo borg extract borg@backupserver:/var/backup/repo/client::client-2021-12-01T18:35:41 etc/yum
+```
+результат
+```
+[vagrant@client ~]$ sudo ls etc
+yum
+```
